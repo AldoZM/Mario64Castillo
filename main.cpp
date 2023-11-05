@@ -26,8 +26,8 @@
 #include <light.h>
 #include <cubemap.h>
 
-#include <irrKlang.h>
-using namespace irrklang;
+// #include <irrKlang.h>
+// using namespace irrklang;
 
 // Max number of bones
 #define MAX_RIGGING_BONES 100
@@ -64,15 +64,10 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
 
-float sineTime = 0.0f;
 
 glm::vec3 position(0.0f,0.0f, 0.0f);
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f);
 float     scaleV = 0.005f;
-float     rotateCharacter = 0.0f;
-float	  door_offset = 0.0f;
-float	  door_rotation = 0.0f;
-float	  window_rotation = 90.0f;
 
 // Shaders
 Shader *ourShader;
@@ -82,16 +77,8 @@ Shader *proceduralShader;
 Shader *wavesShader;
 
 // Carga la información del modelo
-Model	*character;
-Model	*house;
-Model   *door;
-Model   *moon;
-Model   *gridMesh;
-Model	*houseWindow;
 
-float tradius = 10.0f;
-float theta = 0.0f;
-float alpha = 0.0f;
+
 
 // Cubemap
 CubeMap *mainCubeMap;
@@ -115,7 +102,7 @@ float proceduralTime = 0.0f;
 float wavesTime = 0.0f;
 
 // Audio
-ISoundEngine *SoundEngine = createIrrKlangDevice();
+// ISoundEngine *SoundEngine = createIrrKlangDevice();
 
 // selección de cámara
 bool    activeCamera = 1; // activamos la primera cámara
@@ -185,14 +172,6 @@ bool Start() {
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	house = new Model("models/IllumModels/House03.fbx");
-	houseWindow = new Model("models/window.fbx");
-	door = new Model("models/IllumModels/Door.fbx");
-	moon = new Model("models/IllumModels/moon.fbx");
-	gridMesh = new Model("models/IllumModels/grid.fbx");
-
-	character = new Model("models/IllumModels/KAYA.fbx");
-
 	// Cubemap
 	vector<std::string> faces
 	{
@@ -206,11 +185,6 @@ bool Start() {
 	mainCubeMap = new CubeMap();
 	mainCubeMap->loadCubemap(faces);
 	
-	// time, arrays
-	character->SetPose(0.0f, gBones);
-
-	fps = (float)character->getFramerate();
-	keys = (int)character->getNumFrames();
 
 	camera3rd.Position = position;
 	camera3rd.Position.y += 1.7f;
@@ -277,7 +251,7 @@ void SetLightUniformVec3(Shader* shader, const char* propertyName, size_t lightI
 
 
 bool Update() {
-	// Cálculo del framerate
+	
 	float currentFrame = (float)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
@@ -289,11 +263,10 @@ bool Update() {
 			animationCount = 0;
 		}
 		// Configuración de la pose en el instante t
-		character->SetPose((float)animationCount, gBones);
+		
 		elapsedTime = 0.0f;
 
 	}
-
 	// Procesa la entrada del teclado o mouse
 	processInput(window);
 
@@ -318,191 +291,8 @@ bool Update() {
 		mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
 	}
 	
-	 {
-		mLightsShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glm::mat4 projection;
-		glm::mat4 view;
-
-		if (activeCamera) {
-			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera.GetViewMatrix();
-		}
-		else {
-			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera3rd.GetViewMatrix();
-		}
-		
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		// Configuramos propiedades de fuentes de luz
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-		
-		mLightsShader->setVec3("eye", camera.Position);
-
-		// Aplicamos propiedades materiales
-		mLightsShader->setVec4("MaterialAmbientColor", material01.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material01.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material01.specular);
-		mLightsShader->setFloat("transparency", material01.transparency);
-
-		house->Draw(*mLightsShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.0f, 2.25f, 0.0f));
-		model = glm::rotate(model, glm::radians(window_rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		mLightsShader->setMat4("model", model);
-		houseWindow->Draw(*mLightsShader);
-
-
-		// Actividad 5.1
-		// Efecto de puerta corrediza
-		// model = glm::translate(model, glm::vec3(0.418f + door_offset, 0.0f, 6.75f));
-		
-		// Efecto de puerta con bisagra
-		// model = glm::rotate(model, glm::radians(door_rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// mLightsShader->setMat4("model", model);
-
-		// door->Draw(*mLightsShader);
-	}
-
-	glUseProgram(0);
-
-
-	// Actividad 5.2
-	
-	{
-		// Activamos el shader de Phong
-		proceduralShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		proceduralShader->setMat4("projection", projection);
-		proceduralShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-		proceduralShader->setMat4("model", model);
-
-		proceduralShader->setFloat("time", proceduralTime);
-		proceduralShader->setFloat("radius", 10.0f);
-		proceduralShader->setFloat("height", 5.0f);
-
-		moon->Draw(*proceduralShader);
-		proceduralTime += 0.0001;
-
-	}
-
-	glUseProgram(0);
-	
-
-	// Actividad 5.3
-	
-	{
-		// Activamos el shader de Phong
-		wavesShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		wavesShader->setMat4("projection", projection);
-		wavesShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(30.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-		wavesShader->setMat4("model", model);
-
-		wavesShader->setFloat("time", wavesTime);
-		wavesShader->setFloat("radius", 5.0f);
-		wavesShader->setFloat("height", 5.0f);
-
-		gridMesh->Draw(*wavesShader);
-		wavesTime += 0.0001;
-
-	}
-
-	glUseProgram(0);
 	
 	
-	// Objeto animado
-	/* {
-		// Activación del shader del personaje
-		ourShader->use();
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		
-		glm::mat4 projection;
-		glm::mat4 view;
-
-		if (activeCamera) {
-			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera.GetViewMatrix();
-		}
-		else {
-			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera3rd.GetViewMatrix();
-		}
-		
-		ourShader->setMat4("projection", projection);
-		ourShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, position); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
-
-		// Dibujamos el modelo
-		character->Draw(*ourShader);
-	}
-
-	glUseProgram(0); 
-
-	*/
-
-	// glfw: swap buffers 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 
@@ -531,64 +321,30 @@ void processInput(GLFWwindow* window)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
-		door_offset += 0.01f;
+		
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-		door_offset -= 0.01f;
+		
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-		door_rotation += 1.f;
+		
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-		door_rotation -= 1.f;
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && window_rotation <= 170.0f)
-		window_rotation += 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && window_rotation >= 10.0f)
-		window_rotation -= 1.0f;
+		
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		
 
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 
-		position = position + scaleV * forwardView;
-		camera3rd.Front = forwardView;
-		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
-
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		position = position - scaleV * forwardView;
-		camera3rd.Front = forwardView;
-		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		rotateCharacter += 0.5f;
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		forwardView = glm::vec3(viewVector);
-		forwardView = glm::normalize(forwardView);
-
-		camera3rd.Front = forwardView;
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		rotateCharacter -= 0.5f;
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		forwardView = glm::vec3(viewVector);
-		forwardView = glm::normalize(forwardView);
-
-		camera3rd.Front = forwardView;
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
