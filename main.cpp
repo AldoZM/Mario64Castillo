@@ -65,9 +65,10 @@ float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
 
 
-glm::vec3 position(0.0f,0.0f, 0.0f);
-glm::vec3 forwardView(0.0f, 0.0f, 1.0f);
+glm::vec3 position(0.0f, 0.0f, 0.0f); // Posicion de la camara en tercera persona
+glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Distancia de la camara en tercera persona con la perspectiva
 float     scaleV = 0.005f;
+float     rotateCharacter = 0.0f;
 
 // Shaders
 Shader *ourShader;
@@ -76,9 +77,11 @@ Shader *mLightsShader;
 Shader *proceduralShader;
 Shader *wavesShader;
 Shader* staticShader;
+
 // Carga la información del modelo
 Model* castle;
-
+Model* pillar;
+Model* player;
 
 // Cubemap
 CubeMap *mainCubeMap;
@@ -173,7 +176,9 @@ bool Start() {
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	castle = new Model("models/castillo.fbx");
+	castle = new Model("models/CastleOpaqueElements.fbx");
+	pillar = new Model("models/pillar.fbx");
+	player = new Model("models/player.fbx");
 
 	// Cubemap
 	vector<std::string> faces
@@ -187,11 +192,17 @@ bool Start() {
 	};
 	mainCubeMap = new CubeMap();
 	mainCubeMap->loadCubemap(faces);
+
+	// time, arrays
+	player->SetPose(0.0f, gBones);
+
+	fps = (float)player->getFramerate();
+	keys = (int) player->getNumFrames();
 	
 
-	camera3rd.Position = position;
-	camera3rd.Position.y += 1.7f;
-	camera3rd.Position -= forwardView;
+	camera3rd.Position = position; // Posicion de la camara en 3ra persona
+	camera3rd.Position.y += 5.0f; // Alto respecto al personaje
+	camera3rd.Position -= forwardView; // Distancia respecto al personaje
 	camera3rd.Front = forwardView;
 
 	// Lights configuration
@@ -266,7 +277,7 @@ bool Update() {
 			animationCount = 0;
 		}
 		// Configuración de la pose en el instante t
-		
+		player->SetPose((float)animationCount, gBones);
 		elapsedTime = 0.0f;
 
 	}
@@ -315,8 +326,74 @@ bool Update() {
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 
-		castle->Draw(*staticShader);
+		// castle->Draw(*staticShader);
 	}
+
+	glUseProgram(0);
+
+	{
+		// Activamos el shader del plano
+		staticShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+		glm::mat4 view = camera.GetViewMatrix();
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+
+		pillar->Draw(*staticShader);
+	}
+
+	glUseProgram(0);
+
+	{
+		// Activación del shader del personaje
+		ourShader->use();
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		glm::mat4 projection;
+		glm::mat4 view;
+
+		if (activeCamera) {
+			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera.GetViewMatrix();
+		}
+		else {
+			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera3rd.GetViewMatrix();
+		}
+
+		ourShader->setMat4("projection", projection);
+		ourShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, position); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
+
+		// Dibujamos el modelo
+		player->Draw(*ourShader);
+	}
+
+	glUseProgram(0);
+
 	
 	
 	glfwSwapBuffers(window);
@@ -346,31 +423,65 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) {}
 		
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {}
 		
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {}
 		
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {}
 		
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {}
 		
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {}
 		
 
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 
+		position = position + scaleV * forwardView;
+		camera3rd.Front = forwardView;
+		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
+		camera3rd.Position = position;
+		camera3rd.Position.y += 1.7f;
+		camera3rd.Position -= forwardView;
+
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		
+		position = position - scaleV * forwardView;
+		camera3rd.Front = forwardView;
+		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
+		camera3rd.Position = position;
+		camera3rd.Position.y += 1.7f;
+		camera3rd.Position -= forwardView;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		
+		rotateCharacter += 0.5f;
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		forwardView = glm::vec3(viewVector);
+		forwardView = glm::normalize(forwardView);
+
+		camera3rd.Front = forwardView;
+		camera3rd.Position = position;
+		camera3rd.Position.y += 1.7f;
+		camera3rd.Position -= forwardView;
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		
+		rotateCharacter -= 0.5f;
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		forwardView = glm::vec3(viewVector);
+		forwardView = glm::normalize(forwardView);
+
+		camera3rd.Front = forwardView;
+		camera3rd.Position = position;
+		camera3rd.Position.y += 1.7f;
+		camera3rd.Position -= forwardView;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
