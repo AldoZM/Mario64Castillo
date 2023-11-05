@@ -75,9 +75,9 @@ Shader *cubemapShader;
 Shader *mLightsShader;
 Shader *proceduralShader;
 Shader *wavesShader;
-
+Shader* staticShader;
 // Carga la información del modelo
-
+Model* castle;
 
 
 // Cubemap
@@ -162,6 +162,7 @@ bool Start() {
 	// Compilación y enlace de shaders
 	ourShader     = new Shader("shaders/10_vertex_skinning-IT.vs", "shaders/10_fragment_skinning-IT.fs");
 	cubemapShader = new Shader("shaders/10_vertex_cubemap.vs", "shaders/10_fragment_cubemap.fs");
+	staticShader = new Shader("shaders/10_vertex_simple.vs", "shaders/10_fragment_simple.fs");
 	mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs");
 	proceduralShader = new Shader("shaders/12_ProceduralAnimation.vs", "shaders/12_ProceduralAnimation.fs");
 	wavesShader = new Shader("shaders/13_wavesAnimation.vs", "shaders/13_wavesAnimation.fs");
@@ -171,6 +172,8 @@ bool Start() {
 
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+
+	castle = new Model("models/castillo.fbx");
 
 	// Cubemap
 	vector<std::string> faces
@@ -291,6 +294,29 @@ bool Update() {
 		mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
 	}
 	
+	{
+		// Activamos el shader del plano
+		staticShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+		glm::mat4 view = camera.GetViewMatrix();
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+
+		castle->Draw(*staticShader);
+	}
 	
 	
 	glfwSwapBuffers(window);
