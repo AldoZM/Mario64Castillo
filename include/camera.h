@@ -60,6 +60,11 @@ public:
         updateCameraVectors();
     }
 
+    void setFront(glm::vec3 direction) {
+        this->Front = direction;
+        updateCameraVectors();
+    }
+
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {

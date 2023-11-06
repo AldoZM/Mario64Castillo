@@ -50,8 +50,9 @@ const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 768;
 
 // Definición de cámara (posición en XYZ)
-Camera camera(glm::vec3(0.0f, 2.0f, 10.0f));
-Camera camera3rd(glm::vec3(0.0f, 0.0f, 0.0f));
+Camera camera1st(glm::vec3(0.0f, 0.0f, 0.0f));
+Camera camera3rd(glm::vec3(0.0f, 5.0f, -15.0f));
+
 
 // Controladores para el movimiento del mouse
 float lastX = SCR_WIDTH / 2.0f;
@@ -65,8 +66,9 @@ float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
 
 
-glm::vec3 position(0.0f, 0.0f, 0.0f); // Posicion de la camara en tercera persona
-glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Distancia de la camara en tercera persona con la perspectiva
+glm::vec3 playerPosition(0.0f, 0.0f, 0.0f); // Posicion del personaje
+glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Distancia de la camara al personaje
+float	camera3rdOffsetY = 4.7f;
 float     scaleV = 0.005f;
 float     rotateCharacter = 0.0f;
 
@@ -77,7 +79,7 @@ Shader *mLightsShader;
 Shader *proceduralShader;
 Shader *wavesShader;
 Shader* staticShader;
-
+Shader* phongShader;
 // Carga la información del modelo
 Model* castle;
 Model* pillar;
@@ -130,7 +132,7 @@ int main()
 
 bool Start() {
 	// Inicialización de GLFW
-
+	//camera.setFront(glm::vec3(0.0f, 0.0f, 0.0f));
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -200,10 +202,10 @@ bool Start() {
 	keys = (int) player->getNumFrames();
 	
 
-	camera3rd.Position = position; // Posicion de la camara en 3ra persona
-	camera3rd.Position.y += 5.0f; // Alto respecto al personaje
-	camera3rd.Position -= forwardView; // Distancia respecto al personaje
-	camera3rd.Front = forwardView;
+	camera1st.Position = playerPosition; // Posicion de la camara en 3ra persona
+	camera1st.Position.y += camera3rdOffsetY; // Alto respecto al personaje
+	camera1st.Position -= forwardView; // Distancia respecto al personaje
+	camera1st.Front = forwardView;
 
 	// Lights configuration
 	
@@ -294,12 +296,12 @@ bool Update() {
 		glm::mat4 view;
 
 		if (activeCamera) {
-			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera.GetViewMatrix();
-		}
-		else {
 			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
 			view = camera3rd.GetViewMatrix();
+		}
+		else {
+			projection = glm::perspective(glm::radians(camera1st.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera1st.GetViewMatrix();
 		}
 		
 		mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
@@ -313,66 +315,56 @@ bool Update() {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		glm::mat4 projection;
+		glm::mat4 view;
+
+		if (activeCamera) {
+			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera3rd.GetViewMatrix();
+		}
+		else {
+			projection = glm::perspective(glm::radians(camera1st.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera1st.GetViewMatrix();
+		}
+
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		glm::mat4 view = camera.GetViewMatrix();
+		
 		staticShader->setMat4("projection", projection);
 		staticShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 
-		// castle->Draw(*staticShader);
+		castle->Draw(*staticShader);
 	}
 
 	glUseProgram(0);
 
+
+
 	{
-		// Activamos el shader del plano
-		staticShader->use();
+		// Activación del shader del personaje
+		ourShader->use();
 
 		// Activamos para objetos transparentes
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-
-		pillar->Draw(*staticShader);
-	}
-
-	glUseProgram(0);
-
-	{
-		// Activación del shader del personaje
-		ourShader->use();
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
 		glm::mat4 projection;
 		glm::mat4 view;
 
 		if (activeCamera) {
-			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera.GetViewMatrix();
-		}
-		else {
 			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
 			view = camera3rd.GetViewMatrix();
+		}
+		else {
+			projection = glm::perspective(glm::radians(camera1st.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera1st.GetViewMatrix();
 		}
 
 		ourShader->setMat4("projection", projection);
@@ -380,7 +372,7 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, position); // translate it down so it's at the center of the scene
+		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
 
@@ -390,6 +382,40 @@ bool Update() {
 
 		// Dibujamos el modelo
 		player->Draw(*ourShader);
+	}
+
+	glUseProgram(0);
+
+
+	{
+		// Activamos el shader del plano
+		staticShader->use();
+
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		glm::mat4 projection;
+		glm::mat4 view;
+
+		if (activeCamera) {
+			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera3rd.GetViewMatrix();
+		}
+		else {
+			projection = glm::perspective(glm::radians(camera1st.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+			view = camera1st.GetViewMatrix();
+		}
+		
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 15.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+
+		pillar->Draw(*staticShader);
 	}
 
 	glUseProgram(0);
@@ -409,13 +435,13 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
+		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
+		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
+		camera3rd.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+		camera3rd.ProcessKeyboard(RIGHT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
@@ -439,21 +465,21 @@ void processInput(GLFWwindow* window)
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 
-		position = position + scaleV * forwardView;
-		camera3rd.Front = forwardView;
-		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		playerPosition = playerPosition + scaleV * forwardView;
+		camera1st.Front = forwardView;
+		camera1st.ProcessKeyboard(FORWARD, deltaTime);
+		camera1st.Position = playerPosition;
+		camera1st.Position.y += camera3rdOffsetY;
+		camera1st.Position -= forwardView;
 
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		position = position - scaleV * forwardView;
-		camera3rd.Front = forwardView;
-		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		playerPosition = playerPosition - scaleV * forwardView;
+		camera1st.Front = forwardView;
+		camera1st.ProcessKeyboard(BACKWARD, deltaTime);
+		camera1st.Position = playerPosition;
+		camera1st.Position.y += camera3rdOffsetY;
+		camera1st.Position -= forwardView;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		rotateCharacter += 0.5f;
@@ -464,10 +490,10 @@ void processInput(GLFWwindow* window)
 		forwardView = glm::vec3(viewVector);
 		forwardView = glm::normalize(forwardView);
 
-		camera3rd.Front = forwardView;
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		camera1st.Front = forwardView;
+		camera1st.Position = playerPosition;
+		camera1st.Position.y += camera3rdOffsetY;
+		camera1st.Position -= forwardView;
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		rotateCharacter -= 0.5f;
@@ -478,10 +504,10 @@ void processInput(GLFWwindow* window)
 		forwardView = glm::vec3(viewVector);
 		forwardView = glm::normalize(forwardView);
 
-		camera3rd.Front = forwardView;
-		camera3rd.Position = position;
-		camera3rd.Position.y += 1.7f;
-		camera3rd.Position -= forwardView;
+		camera1st.Front = forwardView;
+		camera1st.Position = playerPosition;
+		camera1st.Position.y += camera3rdOffsetY;
+		camera1st.Position -= forwardView;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
@@ -514,11 +540,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastX = (float)xpos;
 	lastY = (float)ypos;
 
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	camera3rd.ProcessMouseMovement(xoffset, yoffset);
 }
 
 // glfw: Complemento para el movimiento y eventos del mouse
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	camera.ProcessMouseScroll((float)yoffset);
+	camera3rd.ProcessMouseScroll((float)yoffset);
 }
