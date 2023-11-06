@@ -138,7 +138,6 @@ int main()
 
 bool Start() {
 	// Inicialización de GLFW
-	//camera.setFront(glm::vec3(0.0f, 0.0f, 0.0f));
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -212,12 +211,10 @@ bool Start() {
 
 	camera1st.Position = playerPosition; // Posicion de la camara en 1ra persona
 	camera1st.Position += camera1stPersonOffset; // Alto respecto al personaje
-	camera1st.Position -= forwardView;
 	camera1st.Front = forwardView;
 
 	camera3rd.Position = playerPosition; // Posiciòn de la camara en 3era persona
 	camera3rd.Position += camera3rdPersonOffset; // Alto respecto al personaje
-	camera3rd.Position -= forwardView;
 	camera3rd.Front = forwardView;
 
 	// Lights configuration
@@ -558,52 +555,19 @@ void processInput(GLFWwindow* window)
 			camera1st.ProcessKeyboard(BACKWARD, deltaTime);
 			camera1st.Position = playerPosition;
 			camera1st.Position += camera1stPersonOffset;
+		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
+	}
 
-		}
-		
-		std::cout << glm::to_string(playerPosition) << std::endl;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		rotateCharacter += 0.5f;
-		if (thirdPerson) {
-			// camera3rd.Front = forwardView;
-			camera3rd.Position = playerPosition;
-			camera3rd.Position += camera3rdPersonOffset;
-		}
-		else {
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-			forwardView = glm::vec3(viewVector);
-			forwardView = glm::normalize(forwardView);
-			camera1st.Front = forwardView;
-			camera1st.Position = playerPosition;
-			camera1st.Position += camera1stPersonOffset;
-		}
-
-
+		camera3rd.ProcessKeyboard(LEFT, deltaTime);
 	}
 		
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		rotateCharacter -= 0.5f;
-
-		if (thirdPerson) {
-			camera3rd.Front = forwardView;
-			camera3rd.Position = playerPosition;
-			camera3rd.Position += camera3rdPersonOffset;
-		}
-		else {
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-			forwardView = glm::vec3(viewVector);
-			forwardView = glm::normalize(forwardView);
-
-			camera1st.Front = forwardView;
-			camera1st.Position = playerPosition;
-			camera1st.Position += camera1stPersonOffset;
-		}
+		camera3rd.ProcessKeyboard(RIGHT, deltaTime);
 	}
 		
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
@@ -628,18 +592,45 @@ void processInput(GLFWwindow* window)
 
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		
-		
+		playerPosition = playerPosition + scaleV * forwardView;
+		camera1st.Front = forwardView;
+		camera1st.ProcessKeyboard(FORWARD, deltaTime);
+		camera1st.Position = playerPosition;
+		camera1st.Position += camera1stPersonOffset;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		
+		playerPosition = playerPosition - scaleV * forwardView;
+		camera1st.Front = forwardView;
+		camera1st.ProcessKeyboard(BACKWARD, deltaTime);
+		camera1st.Position = playerPosition;
+		camera1st.Position += camera1stPersonOffset;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		rotateCharacter += 0.5f;
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		forwardView = glm::vec3(viewVector);
+		forwardView = glm::normalize(forwardView);
+
+		camera1st.Front = forwardView;
+		camera1st.Position = playerPosition;
+		camera1st.Position += camera1stPersonOffset;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		rotateCharacter -= 0.5f;
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		forwardView = glm::vec3(viewVector);
+		forwardView = glm::normalize(forwardView);
+
+		camera1st.Front = forwardView;
+		camera1st.Position = playerPosition;
+		camera1st.Position += camera1stPersonOffset;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
@@ -654,7 +645,6 @@ void processInput(GLFWwindow* window)
 		
 	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
 		camera3rd.Front = forwardView;
-		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
 		camera3rd.Position = playerPosition;
 		camera3rd.Position += camera3rdPersonOffset;
 		thirdPerson = true;
@@ -686,7 +676,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastX = (float)xpos;
 	lastY = (float)ypos;
 
-	camera1st.ProcessMouseMovement(xoffset, 0);
+	camera3rd.ProcessMouseMovement(xoffset, yoffset);
 }
 
 // glfw: Complemento para el movimiento y eventos del mouse
