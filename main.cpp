@@ -399,11 +399,32 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 15.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(4.0f, 5.5f, 40.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 
+		pillar->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-5.0f, 5.5f, 40.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		pillar->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.5f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		pillar->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.5f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
 		pillar->Draw(*staticShader);
 	}
 
@@ -434,35 +455,39 @@ void processInput(GLFWwindow* window)
 
 		}
 		else {
-			camera1st.Front = forwardView;
+			playerPosition = playerPosition + scaleV * forwardView;
+			 // camera1st.Front = forwardView;
 			camera1st.ProcessKeyboard(FORWARD, deltaTime);
 			camera1st.Position = playerPosition;
 			camera1st.Position += camera1stPersonOffset;
 
 		}
+
+		std::cout << glm::to_string(playerPosition) << std::endl;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		playerPosition = playerPosition - scaleV * forwardView;
 		if (thirdPerson) {
-			camera3rd.Front = forwardView;
+			// camera3rd.Front = forwardView;
 			camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
 			camera3rd.Position = playerPosition;
 			camera3rd.Position += camera3rdPersonOffset;
 		}
 		else {
-			camera1st.Front = forwardView;
+			// camera1st.Front = forwardView;
 			camera1st.ProcessKeyboard(BACKWARD, deltaTime);
 			camera1st.Position = playerPosition;
 			camera1st.Position += camera1stPersonOffset;
 
 		}
 		
+		std::cout << glm::to_string(playerPosition) << std::endl;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		rotateCharacter += 0.5f;
 		if (thirdPerson) {
-			camera3rd.Front = forwardView;
+			// camera3rd.Front = forwardView;
 			camera3rd.Position = playerPosition;
 			camera3rd.Position += camera3rdPersonOffset;
 		}
@@ -476,6 +501,8 @@ void processInput(GLFWwindow* window)
 			camera1st.Position = playerPosition;
 			camera1st.Position += camera1stPersonOffset;
 		}
+
+
 	}
 		
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
@@ -579,7 +606,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastX = (float)xpos;
 	lastY = (float)ypos;
 
-	camera3rd.ProcessMouseMovement(xoffset, yoffset);
+	camera1st.ProcessMouseMovement(xoffset, 0);
 }
 
 // glfw: Complemento para el movimiento y eventos del mouse
