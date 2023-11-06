@@ -501,62 +501,9 @@ void processInput(GLFWwindow* window)
 		
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		//Cambio W1
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		forwardView = glm::vec3(viewVector);
-		forwardView = glm::normalize(forwardView);
-		//W1
-
-
-
-
-		playerPosition = playerPosition + scaleV * forwardView;
-		if (thirdPerson) {
-			//camera3rd.Front = forwardView;
-			camera3rd.Front = glm::vec3(0.0f,0.0f,1.0f);
-			camera3rd.ProcessKeyboard(FORWARD, deltaTime);
-			camera3rd.Position = playerPosition;
-			camera3rd.Position += camera3rdPersonOffset;
-
-		}
-		else {
-			playerPosition = playerPosition + scaleV * forwardView;
-			 // camera1st.Front = forwardView;
-			camera1st.ProcessKeyboard(FORWARD, deltaTime);
-			camera1st.Position = playerPosition;
-			camera1st.Position += camera1stPersonOffset;
-
-		}
-
-		std::cout << glm::to_string(playerPosition) << std::endl;
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		//Cambio S1
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		forwardView = glm::vec3(viewVector);
-		forwardView = glm::normalize(forwardView);
-		//S1
-
-
-		playerPosition = playerPosition - scaleV * forwardView;
-		if (thirdPerson) {
-			//camera3rd.Front = forwardView;
-			camera3rd.Front = glm::vec3(0.0f, 0.0f, 1.0f);
-			camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
-			camera3rd.Position = playerPosition;
-			camera3rd.Position += camera3rdPersonOffset;
-		}
-		else {
-			// camera1st.Front = forwardView;
-			camera1st.ProcessKeyboard(BACKWARD, deltaTime);
-			camera1st.Position = playerPosition;
-			camera1st.Position += camera1stPersonOffset;
 		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
 	}
+	
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
