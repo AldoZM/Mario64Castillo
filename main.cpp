@@ -85,6 +85,7 @@ Shader *proceduralShader;
 Shader *wavesShader;
 Shader* staticShader;
 Shader* phongShader;
+
 // Carga la información del modelo
 Model* castle;
 Model* pillar;
@@ -186,6 +187,7 @@ bool Start() {
 	castle = new Model("models/CastleOpaqueElements.fbx");
 	pillar = new Model("models/pillar.fbx");
 	player = new Model("models/player.fbx");
+
 
 	// Cubemap
 	vector<std::string> faces
@@ -430,7 +432,6 @@ bool Update() {
 
 	glUseProgram(0);
 
-	
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
