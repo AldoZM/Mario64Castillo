@@ -323,18 +323,11 @@ bool Update() {
 		glm::mat4 projection;
 		glm::mat4 view;
 
-		//chooseCamera(&projection, &view);
-		if (thirdPerson) {
-			projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera3rd.GetViewMatrix();
-		}
-		else {
-			projection = glm::perspective(glm::radians(camera1st.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-			view = camera1st.GetViewMatrix();
-		}
+		chooseCamera(&projection, &view);
+		
 
-		ourShader->setMat4("projection", projection);
-		ourShader->setMat4("view", view);
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
 
 		
 
@@ -596,8 +589,6 @@ void processInput(GLFWwindow* window)
 		camera3rd.Position += camera3rdPersonOffset;
 		thirdPerson = true;
 	}
-		
-	
 }
 
 // glfw: Actualizamos el puerto de vista si hay cambios del tamaño
