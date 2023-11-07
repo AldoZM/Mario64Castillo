@@ -41,7 +41,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-void chooseCamera(glm::mat4* projection, glm::mat4* view);
+void getProjAndView(glm::mat4* projection, glm::mat4* view);
 // Gobals
 GLFWwindow* window;
 
@@ -52,6 +52,7 @@ const unsigned int SCR_HEIGHT = 768;
 // Definición de cámara (posición en XYZ)
 Camera camera1st(glm::vec3(0.0f, 0.0f, 0.0f));
 Camera camera3rd(glm::vec3(0.0f, 0.0f, 0.0f));
+Camera* activeCamera;
 
 
 // Controladores para el movimiento del mouse
@@ -116,7 +117,7 @@ float wavesTime = 0.0f;
 // ISoundEngine *SoundEngine = createIrrKlangDevice();
 
 // selección de cámara
-bool    thirdPerson = true; // activamos la camara en tercera persona
+//bool    thirdPerson = true; // activamos la camara en tercera persona
 
 // Entrada a función principal
 int main()
@@ -239,7 +240,7 @@ bool Start() {
 	light04.Color = glm::vec4(0.2f, 0.2f, 0.0f, 1.0f);
 	gLights.push_back(light04);
 	
-
+	activeCamera = &camera3rd;
 	// SoundEngine->play2D("sound/EternalGarden.mp3", true);
 	std::cout<<"Linea 247"<<std::endl;
 	return true;
@@ -305,11 +306,12 @@ bool Update() {
 		glm::mat4 projection;
 		glm::mat4 view;
 
-		chooseCamera(&projection, &view);
+		getProjAndView(&projection, &view);
 
 		
 		mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
 	}
+
 	std::cout << "Linea Castle" << std::endl;
 	
 	{
@@ -323,7 +325,7 @@ bool Update() {
 		glm::mat4 projection;
 		glm::mat4 view;
 
-		chooseCamera(&projection, &view);
+		getProjAndView(&projection, &view);
 		
 
 		staticShader->setMat4("projection", projection);
@@ -357,7 +359,7 @@ bool Update() {
 		glm::mat4 projection;
 		glm::mat4 view;
 
-		chooseCamera(&projection, &view);
+		getProjAndView(&projection, &view);
 
 
 		ourShader->setMat4("projection", projection);
@@ -393,7 +395,7 @@ bool Update() {
 		glm::mat4 projection;
 		glm::mat4 view;
 
-		chooseCamera(&projection, &view);
+		getProjAndView(&projection, &view);
 		
 		staticShader->setMat4("projection", projection);
 		staticShader->setMat4("view", view);
@@ -580,14 +582,14 @@ void processInput(GLFWwindow* window)
 		camera1st.ProcessKeyboard(FORWARD, deltaTime);
 		camera1st.Position = playerPosition;
 		camera1st.Position += camera1stPersonOffset;
-		thirdPerson = false;
+		activeCamera = &camera1st;
 	}
 		
 	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
 		camera3rd.Front = forwardView;
 		camera3rd.Position = playerPosition;
 		camera3rd.Position += camera3rdPersonOffset;
-		thirdPerson = true;
+		activeCamera = &camera3rd;
 	}
 }
 
@@ -623,13 +625,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	camera3rd.ProcessMouseScroll((float)yoffset);
 }
 
-void chooseCamera(glm::mat4 *projection, glm::mat4 *view) {
-	if (thirdPerson) {
-		*projection = glm::perspective(glm::radians(camera3rd.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		*view = camera3rd.GetViewMatrix();
-	}
-	else {
-		*projection = glm::perspective(glm::radians(camera1st.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		*view = camera1st.GetViewMatrix();
-	}
+void getProjAndView(glm::mat4 *projection, glm::mat4 *view) {
+		*projection = glm::perspective(glm::radians(activeCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+		*view = activeCamera->GetViewMatrix();
 }
