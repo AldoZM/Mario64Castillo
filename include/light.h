@@ -18,13 +18,19 @@ public:
 	int       alphaIndex;
 	float     distance;
 
-	Light() {
-		Position = glm::vec3(0.0f, 0.0f, 0.0f); // Posición de la fuente de luz
-		Direction = glm::vec3(1.0f, 0.0f, 0.0f); // Dirección (no aplica para fuentes puntuales)
-		Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // Color de la fuente de luz
-		Power = glm::vec4(60.0f, 60.0f, 60.0f, 1.0f); // Potencia en Watts
-		alphaIndex = 10; // potencia del brillo especular
-		distance = 3.0f;
+	Light(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+		glm::vec4 power = glm::vec4(250.0f, 250.0f, 250.0f, 1.0f),
+		int alphaIndex = 10, 
+		float distance = 10.0f) 
+	{
+		this->Position = position;
+		this->Direction = direction;
+		this->Color = color;
+		this->Power = power;
+		this->alphaIndex = alphaIndex;
+		this->distance = distance;
 	}
 	~Light() {}
 

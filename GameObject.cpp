@@ -7,14 +7,14 @@
 //	this->objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 //}
 
-GameObject::GameObject(float x, float y, float z, std::string soundPath) {
+GameObject::GameObject(float x, float y, float z, std::string soundPath = "") {
 	this->objectPosition = glm::vec3(x, y, z);
-	this->soundEffectPath = soundPath.c_str();
+	this->soundEffectPath = soundPath;
 }
 
-GameObject::GameObject(glm::vec3 position, std::string soundPath) {
+GameObject::GameObject(glm::vec3 position, std::string soundPath = "") {
 	this->objectPosition = position;
-	this->soundEffectPath = soundPath.c_str();
+	this->soundEffectPath = soundPath;
 }
 
 glm::vec3 GameObject::getObjectPosition() const {

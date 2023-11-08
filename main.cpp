@@ -111,7 +111,7 @@ GameObject* moveObject;
 CubeMap* mainCubeMap;
 
 // Materiales
-Material material01;
+Material material;
 
 // Light gLight;
 std::vector<Light> gLights;
@@ -128,6 +128,8 @@ float	fps = 0.0f;
 int		keys = 0;
 int		animationCount = 0;
 
+float elapsedTime2 = 0.0f;
+
 float proceduralTime = 0.0f;
 float wavesTime = 0.0f;
 float distance; // Variable usada para guardar la distancia entre la camara y un modelo
@@ -140,8 +142,7 @@ ISoundEngine* SoundEngine = createIrrKlangDevice();
 int minimalDistanceAudio = 5;
 int minimalDistanceTransforms = 8;
 
-// selección de cámara
-//bool    thirdPerson = true; // activamos la camara en tercera persona
+bool disableSounds = false;
 
 // Entrada a función principal
 int main()
@@ -198,10 +199,10 @@ bool Start() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Compilación y enlace de shaders
-	ourShader = new Shader("shaders/10_vertex_skinning-IT.vs", "shaders/10_fragment_skinning-IT.fs");
-	cubemapShader = new Shader("shaders/10_vertex_cubemap.vs", "shaders/10_fragment_cubemap.fs");
-	staticShader = new Shader("shaders/10_vertex_simple.vs", "shaders/10_fragment_simple.fs");
-	mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs");
+	ourShader = new Shader("shaders/10_vertex_skinning-IT.vs", "shaders/10_fragment_skinning-IT.fs"); // Shader para el personaje
+	cubemapShader = new Shader("shaders/10_vertex_cubemap.vs", "shaders/10_fragment_cubemap.fs"); // Shader para el cubemap
+	staticShader = new Shader("shaders/10_vertex_simple.vs", "shaders/10_fragment_simple.fs"); // Shader sin fuentes de iluminaciòn
+	mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs"); // Shader para multiples fuentes de iluminaciòn
 
 	// Máximo número de huesos: 100
 	ourShader->setBonesIDs(MAX_RIGGING_BONES);
@@ -255,28 +256,23 @@ bool Start() {
 
 	// Lights configuration
 
-	Light light01;
-	light01.Position = glm::vec3(5.0f, 2.0f, 5.0f);
-	light01.Color = glm::vec4(0.2f, 0.0f, 0.0f, 1.0f);
-	gLights.push_back(light01);
+	Light light;
+	light.Position = glm::vec3(4.0f, 20.0f, 53.0f);
+	light.Color = glm::vec4(0.2f, 0.0f, 0.0f, 1.0f);
+	// mainLight.alphaIndex = 13; // àngulo de rotaciòn
+	gLights.push_back(light);
 
 	Light light02;
-	light02.Position = glm::vec3(-5.0f, 2.0f, 5.0f);
-	light02.Color = glm::vec4(0.0f, 0.2f, 0.0f, 1.0f);
+	light02.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
+	light02.Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	gLights.push_back(light02);
+	
 
-	Light light03;
-	light03.Position = glm::vec3(5.0f, 2.0f, -5.0f);
-	light03.Color = glm::vec4(0.0f, 0.0f, 0.2f, 1.0f);
-	gLights.push_back(light03);
-
-	Light light04;
-	light04.Position = glm::vec3(-5.0f, 2.0f, -5.0f);
-	light04.Color = glm::vec4(0.2f, 0.2f, 0.0f, 1.0f);
-	gLights.push_back(light04);
-
+	// Configuración de la camara
 	activeCamera = &camera3rd; // Se activa la camara en tercera persona
 
+
+	// Configuración de los archivos a cargar
 	pillarsPositions.push_back(glm::vec3(4.0f, 5.5f, 40.0f));
 	pillarsPositions.push_back(glm::vec3(-5.0f, 5.5f, 40.0f));
 	pillarsPositions.push_back(glm::vec3(2.5f, 5.5f, 53.0f));
@@ -307,8 +303,7 @@ bool Start() {
 		soundEffectPath = soundEffectsPaths.at(i);
 		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
 	}
-
-
+	// RGBa (Red, Green, Blue and Alpha)
 	SoundEngine->play2D("audio/gta.mp3");
 	return true;
 }
@@ -430,11 +425,11 @@ bool Update() {
 		player->Draw(*ourShader);
 	}
 
-	glUseProgram(0);
+	mLightsShader->use();
 
 	{
 		// Activamos el shader del plano
-		staticShader->use();
+		mLightsShader->use();
 
 		// Activamos para objetos transparentes
 		glEnable(GL_BLEND);
@@ -443,15 +438,15 @@ bool Update() {
 		for (size_t i = 0; i < MAX_PILLARS; i++)
 		{
 			// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-			staticShader->setMat4("projection", projection);
-			staticShader->setMat4("view", view);
+			mLightsShader->setMat4("projection", projection);
+			mLightsShader->setMat4("view", view);
 
 			glm::vec3 objectPosition = gameObjectsPillars[i]->getObjectPosition();
 			auto distance = glm::length(playerPosition - objectPosition);
 
 
 			soundPath = gameObjectsPillars[i]->getSoundPathC();
-			if (distance < minimalDistanceAudio && !SoundEngine->isCurrentlyPlaying(soundPath)) {
+			if (distance < minimalDistanceAudio && !SoundEngine->isCurrentlyPlaying(soundPath) && !disableSounds) {
 				SoundEngine->stopAllSounds();
 				SoundEngine->play2D(soundPath);
 			}
@@ -464,13 +459,30 @@ bool Update() {
 			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
 			model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-			staticShader->setMat4("model", model);
+			mLightsShader->setMat4("model", model);
 
-			pillar->Draw(*staticShader);
+			mLightsShader->setInt("numLights", (int)gLights.size());
+			for (size_t i = 0; i < gLights.size(); ++i) {
+				SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+				SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+				SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+				SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+				SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+				SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+			}
+
+			mLightsShader->setVec3("eye", activeCamera->Position);
+
+			mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+			mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+			mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+			mLightsShader->setFloat("transparency", material.transparency);
+
+			pillar->Draw(*mLightsShader);
 		}
 	}
 
-
+	staticShader->use();
 	{
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
 
@@ -514,9 +526,10 @@ bool Update() {
 
 	}
 
+	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
 	{
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
@@ -524,9 +537,25 @@ bool Update() {
 		model = glm::translate(model, glm::vec3(-1.0f, 3.0f, 45.0f)); // translate it down so it's at the center of the scene
 
 		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
+		mLightsShader->setMat4("model", model);
 
-		ps1->Draw(*staticShader);
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+		ps1->Draw(*mLightsShader);
 	}
 
 	{
@@ -544,21 +573,40 @@ bool Update() {
 		xbox->Draw(*staticShader);
 	}
 
+	mLightsShader->use(); // Activamos el shader de iluminación
+
 	{
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
 
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
-		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(5.0f, 5.0f, 50.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
+		mLightsShader->setMat4("model", model);
 
-		n64->Draw(*staticShader);
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		n64->Draw(*mLightsShader);
 	}
 
 	glUseProgram(0);
@@ -685,9 +733,20 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
+		
 		camera3rd.Position = playerPosition;
 		camera3rd.Position += camera3rdPersonOffset;
 		activeCamera = &camera3rd;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		
+		elapsedTime2 += deltaTime;
+		if (elapsedTime2 > 0.5f) {
+			SoundEngine->stopAllSounds();
+			disableSounds = !disableSounds;
+			elapsedTime2 = 0.0f;
+		}
 	}
 }
 
