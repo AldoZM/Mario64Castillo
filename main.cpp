@@ -25,12 +25,14 @@
 #include <material.h>
 #include <light.h>
 #include <cubemap.h>
+#include "GameObject.h"
 
-// #include <irrKlang.h>
-// using namespace irrklang;
+#include <irrKlang.h>
+using namespace irrklang;
 
 // Max number of bones
 #define MAX_RIGGING_BONES 100
+#define MAX_PILLARS 10
 
 // Functions
 bool Start();
@@ -40,8 +42,7 @@ bool Update();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
-void getProjAndView(glm::mat4* projection, glm::mat4* view);
+void processInput(GLFWwindow* window);
 // Gobals
 GLFWwindow* window;
 
@@ -66,24 +67,19 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
 
-
 glm::vec3 playerPosition(0.0f, 3.0f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
-glm::vec3 camera1stPersonOffset(0.0f, 4.0f,-1.0f);
+glm::vec3 camera1stPersonOffset(0.0f, 4.0f, -1.0f);
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
-
-glm::vec3 rightView(1.0f, 0.0f, 0.0f);
 
 float     scaleV = 0.05f;
 float     scaleH = 0.005f;
 float     rotateCharacter = 0.0f;
 
 // Shaders
-Shader *ourShader;
-Shader *cubemapShader;
-Shader *mLightsShader;
-Shader *proceduralShader;
-Shader *wavesShader;
+Shader* ourShader;
+Shader* cubemapShader;
+Shader* mLightsShader;
 Shader* staticShader;
 Shader* phongShader;
 
@@ -92,19 +88,41 @@ Model* castle;
 Model* pillar;
 Model* player;
 
+// Nuevos modelos
+Model* mesa;
+Model* sensor;
+
+//Modelos carlos
+Model* librero;
+Model* computadora;
+Model* silla;
+Model* root;
+Model* xbox;
+
+//Modelos aldo
+Model* n64;
+Model* ps1;
+
+
+GameObject* gameObjectsPillars[10];
+GameObject* moveObject;
+
 // Cubemap
-CubeMap *mainCubeMap;
+CubeMap* mainCubeMap;
 
 // Materiales
 Material material01;
 
 // Light gLight;
 std::vector<Light> gLights;
-Light    lightMoon;
 
 // Pose inicial del modelo
 glm::mat4 gBones[MAX_RIGGING_BONES];
 glm::mat4 gBonesBar[MAX_RIGGING_BONES];
+
+glm::mat4 projection; // Variable usada para guardar la matriz de proyecciòn
+glm::mat4 view;  // Variable usada para guardar la matriz de vista(camara)
+glm::mat4 model; // Variable usada para guardar la matriz de las transformaciones del modelo
 
 float	fps = 0.0f;
 int		keys = 0;
@@ -112,9 +130,15 @@ int		animationCount = 0;
 
 float proceduralTime = 0.0f;
 float wavesTime = 0.0f;
+float distance; // Variable usada para guardar la distancia entre la camara y un modelo
+
+const char* soundPath;
 
 // Audio
-// ISoundEngine *SoundEngine = createIrrKlangDevice();
+ISoundEngine* SoundEngine = createIrrKlangDevice();
+
+int minimalDistanceAudio = 5;
+int minimalDistanceTransforms = 8;
 
 // selección de cámara
 //bool    thirdPerson = true; // activamos la camara en tercera persona
@@ -138,6 +162,9 @@ int main()
 }
 
 bool Start() {
+	std::vector<glm::vec3> pillarsPositions; // Arreglo para guardar las posiciones de los pilares
+	std::vector <std::string> soundEffectsPaths; // Arreglo para guardar las direcciones de los efectos de sonido
+
 	// Inicialización de GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -171,12 +198,10 @@ bool Start() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Compilación y enlace de shaders
-	ourShader     = new Shader("shaders/10_vertex_skinning-IT.vs", "shaders/10_fragment_skinning-IT.fs");
+	ourShader = new Shader("shaders/10_vertex_skinning-IT.vs", "shaders/10_fragment_skinning-IT.fs");
 	cubemapShader = new Shader("shaders/10_vertex_cubemap.vs", "shaders/10_fragment_cubemap.fs");
 	staticShader = new Shader("shaders/10_vertex_simple.vs", "shaders/10_fragment_simple.fs");
 	mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs");
-	proceduralShader = new Shader("shaders/12_ProceduralAnimation.vs", "shaders/12_ProceduralAnimation.fs");
-	wavesShader = new Shader("shaders/13_wavesAnimation.vs", "shaders/13_wavesAnimation.fs");
 
 	// Máximo número de huesos: 100
 	ourShader->setBonesIDs(MAX_RIGGING_BONES);
@@ -187,6 +212,18 @@ bool Start() {
 	castle = new Model("models/CastleOpaqueElements.fbx");
 	pillar = new Model("models/pillar.fbx");
 	player = new Model("models/player.fbx");
+	//Nuevos modelos
+	mesa = new Model("models/mesa.fbx");
+	sensor = new Model("models/sensor.fbx");
+	//Modelos Carlos
+	librero = new Model("models/librerofinal.fbx");
+	//computadora = new Model("models/computadora.fbx");
+	silla = new Model("models/silla.fbx");
+	root = new Model("models/rooflamp.fbx");
+	xbox = new Model("models/xboxone.fbx");
+	//Modelos aldo
+	n64 = new Model("models/N64.fbx");
+	ps1 = new Model("models/PS1.fbx");
 
 
 	// Cubemap
@@ -206,9 +243,7 @@ bool Start() {
 	player->SetPose(0.0f, gBones);
 
 	fps = (float)player->getFramerate();
-	keys = (int) player->getNumFrames();
-	
-
+	keys = (int)player->getNumFrames();
 
 	camera1st.Position = playerPosition; // Posicion de la camara en 1ra persona
 	camera1st.Position += camera1stPersonOffset; // Alto respecto al personaje
@@ -219,7 +254,7 @@ bool Start() {
 	camera3rd.Front = forwardView;
 
 	// Lights configuration
-	
+
 	Light light01;
 	light01.Position = glm::vec3(5.0f, 2.0f, 5.0f);
 	light01.Color = glm::vec4(0.2f, 0.0f, 0.0f, 1.0f);
@@ -239,12 +274,45 @@ bool Start() {
 	light04.Position = glm::vec3(-5.0f, 2.0f, -5.0f);
 	light04.Color = glm::vec4(0.2f, 0.2f, 0.0f, 1.0f);
 	gLights.push_back(light04);
-	
-	activeCamera = &camera3rd;
-	// SoundEngine->play2D("sound/EternalGarden.mp3", true);
-	std::cout<<"Linea 247"<<std::endl;
+
+	activeCamera = &camera3rd; // Se activa la camara en tercera persona
+
+	pillarsPositions.push_back(glm::vec3(4.0f, 5.5f, 40.0f));
+	pillarsPositions.push_back(glm::vec3(-5.0f, 5.5f, 40.0f));
+	pillarsPositions.push_back(glm::vec3(2.5f, 5.5f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(-3.5f, 5.5f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(9.0f, 5.5f, 59.5f));
+	pillarsPositions.push_back(glm::vec3(-9.0f, 5.5f, 59.0f));
+	pillarsPositions.push_back(glm::vec3(13.0f, 5.5f, 52.5f));
+	pillarsPositions.push_back(glm::vec3(-14.0f, 5.5f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(8.0f, 10.5f, 64.0f));
+	pillarsPositions.push_back(glm::vec3(-5.0f, 10.5f, 61.0f));
+
+	soundEffectsPaths.push_back("audio/ps1.mp3");
+	soundEffectsPaths.push_back("audio/gba.mp3");
+	soundEffectsPaths.push_back("audio/ps2.mp3");
+	soundEffectsPaths.push_back("audio/pc.mp3");
+	soundEffectsPaths.push_back("audio/gb.mp3");
+	soundEffectsPaths.push_back("audio/orb.mp3");
+	soundEffectsPaths.push_back("audio/xbox.mp3");
+	soundEffectsPaths.push_back("audio/pda.mp3");
+	soundEffectsPaths.push_back("audio/ok.mp3");
+	soundEffectsPaths.push_back("audio/oof.mp3");
+
+	glm::vec3 position;
+	std::string soundEffectPath;
+	for (size_t i = 0; i < MAX_PILLARS; i++)
+	{
+		position = pillarsPositions.at(i);
+		soundEffectPath = soundEffectsPaths.at(i);
+		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
+	}
+
+
+	SoundEngine->play2D("audio/gta.mp3");
 	return true;
 }
+
 
 
 void SetLightUniformInt(Shader* shader, const char* propertyName, size_t lightIndex, int value) {
@@ -278,7 +346,6 @@ void SetLightUniformVec3(Shader* shader, const char* propertyName, size_t lightI
 
 
 bool Update() {
-	std::cout << "Linea 283" << std::endl;
 	float currentFrame = (float)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
@@ -297,44 +364,34 @@ bool Update() {
 	// Procesa la entrada del teclado o mouse
 	processInput(window);
 
+	projection = glm::perspective(glm::radians(activeCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f); // Sè define la matriz de perspectiva
+	view = activeCamera->GetViewMatrix();
+
 	// Renderizado R - G - B - A
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	std::cout << "Linea Cube map" << std::endl;
+
+
+
+
 	// Cubemap (fondo)
 	{
-		glm::mat4 projection;
-		glm::mat4 view;
-
-		getProjAndView(&projection, &view);
-
-		
 		mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
 	}
 
-	std::cout << "Linea Castle" << std::endl;
-	
-	{
-		// Activamos el shader del plano
-		staticShader->use();
 
+	{
+		staticShader->use();
 		// Activamos para objetos transparentes
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glm::mat4 projection;
-		glm::mat4 view;
-
-		getProjAndView(&projection, &view);
-		
-
-		staticShader->setMat4("projection", projection);
+		// Activamos el shader del plano
 		staticShader->setMat4("view", view);
-
-		
+		staticShader->setMat4("projection", projection);
 
 		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
@@ -346,7 +403,6 @@ bool Update() {
 	glUseProgram(0);
 
 
-	std::cout << "Linea player" << std::endl;
 	{
 		// Activación del shader del personaje
 		ourShader->use();
@@ -356,17 +412,12 @@ bool Update() {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		glm::mat4 projection;
-		glm::mat4 view;
 
-		getProjAndView(&projection, &view);
-
-
-		ourShader->setMat4("projection", projection);
 		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
 
 		// Aplicamos transformaciones del modelo
-		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::mat4(1.0f);
 		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
@@ -381,7 +432,6 @@ bool Update() {
 
 	glUseProgram(0);
 
-	std::cout << "Linea pilares" << std::endl;
 	{
 		// Activamos el shader del plano
 		staticShader->use();
@@ -390,98 +440,129 @@ bool Update() {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		for (size_t i = 0; i < MAX_PILLARS; i++)
+		{
+			// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+			staticShader->setMat4("projection", projection);
+			staticShader->setMat4("view", view);
 
+			glm::vec3 objectPosition = gameObjectsPillars[i]->getObjectPosition();
+			auto distance = glm::length(playerPosition - objectPosition);
+
+
+			soundPath = gameObjectsPillars[i]->getSoundPathC();
+			if (distance < minimalDistanceAudio && !SoundEngine->isCurrentlyPlaying(soundPath)) {
+				SoundEngine->stopAllSounds();
+				SoundEngine->play2D(soundPath);
+			}
+			if (distance < minimalDistanceTransforms) {
+				moveObject = gameObjectsPillars[i];
+				objectPosition = gameObjectsPillars[i]->getObjectPosition();
+			}
+
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
+			model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			staticShader->setMat4("model", model);
+
+			pillar->Draw(*staticShader);
+		}
+	}
+
+
+	{
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		glm::mat4 projection;
-		glm::mat4 view;
 
-		getProjAndView(&projection, &view);
-		
 		staticShader->setMat4("projection", projection);
 		staticShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		//mesa2
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(4.0f, 5.5f, 40.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(14.0f, 4.1f, 56.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		//model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		mesa->Draw(*staticShader);
+		//mESA 1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(7.0f, 4.1f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		mesa->Draw(*staticShader);
+
+		//Mesa 4
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-14.0f, 4.1f, 56.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		mesa->Draw(*staticShader);
+
+		//Mesa 3
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-7.0f, 4.1f, 57.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(120.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		mesa->Draw(*staticShader);
+
+	}
+
+	{
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-1.0f, 3.0f, 45.0f)); // translate it down so it's at the center of the scene
+
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 
-		pillar->Draw(*staticShader);
+		ps1->Draw(*staticShader);
+	}
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-5.0f, 5.5f, 40.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2.5f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 4.0f, 45.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.5f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
+		xbox->Draw(*staticShader);
+	}
 
-		//Nuevos pilares
-		//1
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(9.0f, 5.5f, 59.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
-		//2
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-9.0f, 5.5f, 59.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
-		//3
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(13.0f, 5.5f, 52.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
 
-		//4
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-14.0f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
 
-		//1 arriba
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(8.0f, 10.5f, 64.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(5.0f, 5.0f, 50.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
-		//2 arriba
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-5.0f, 10.5f, 61.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		pillar->Draw(*staticShader);
 
-
+		n64->Draw(*staticShader);
 	}
 
 	glUseProgram(0);
 
-	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 
@@ -493,25 +574,25 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-		
+
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
 	}
-	
+
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		camera3rd.ProcessKeyboard(BACKWARD, deltaTime);
 	}
-	
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		camera3rd.ProcessKeyboard(LEFT, deltaTime);
 	}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		camera3rd.ProcessKeyboard(RIGHT, deltaTime);
 	}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
@@ -520,17 +601,35 @@ void processInput(GLFWwindow* window)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) {}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {}
-		
+
+	// Funciòn para mover un objeto en z hacìa el lado negativo
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		if (moveObject != NULL) {
+			moveObject->moveObjectPosition(0.0f, 0.0f, -0.01f);
+		}
+
+		moveObject = NULL;
+	}
+
+	// Funciòn para mover un objeto en z hacìa el lado positivo
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		if (moveObject != NULL) {
+			moveObject->moveObjectPosition(0.0f, 0.0f, 0.01f);
+		}
+
+		moveObject = NULL;
+	}
+
 
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
@@ -578,15 +677,14 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
 		/*Sirve para refrescar la posición de la camara debido a que la posición del jugador
 		se mueve, entonces si estamos en la otra camara los cambios no se ven reflejados en la activación de esta camara*/
-		camera1st.Front = forwardView; 
+		camera1st.Front = forwardView;
 		camera1st.ProcessKeyboard(FORWARD, deltaTime);
 		camera1st.Position = playerPosition;
 		camera1st.Position += camera1stPersonOffset;
 		activeCamera = &camera1st;
 	}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
-		camera3rd.Front = forwardView;
 		camera3rd.Position = playerPosition;
 		camera3rd.Position += camera3rdPersonOffset;
 		activeCamera = &camera3rd;
@@ -611,7 +709,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = (float)xpos - lastX;
-	float yoffset = lastY - (float)ypos; 
+	float yoffset = lastY - (float)ypos;
 
 	lastX = (float)xpos;
 	lastY = (float)ypos;
@@ -623,9 +721,4 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	camera3rd.ProcessMouseScroll((float)yoffset);
-}
-
-void getProjAndView(glm::mat4 *projection, glm::mat4 *view) {
-		*projection = glm::perspective(glm::radians(activeCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-		*view = activeCamera->GetViewMatrix();
 }
