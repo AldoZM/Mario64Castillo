@@ -67,7 +67,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
 
-glm::vec3 playerPosition(0.0f, 3.0f, 0.0f); // Posicion del personaje
+glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
 glm::vec3 camera1stPersonOffset(0.0f, 4.0f, -1.0f);
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
@@ -415,7 +415,7 @@ bool Update() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 
 		ourShader->setMat4("model", model);
 
@@ -526,6 +526,25 @@ bool Update() {
 
 	}
 
+	staticShader->use();
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa2
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-10.0f, 6.0f, 42.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		librero->Draw(*staticShader);
+	}
+
+
 	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
 	{
 		mLightsShader->setMat4("projection", projection);
@@ -558,19 +577,39 @@ bool Update() {
 		ps1->Draw(*mLightsShader);
 	}
 
+	mLightsShader->use();
 	{
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2.0f, 4.0f, 45.0f)); // translate it down so it's at the center of the scene
+		//										z(positivo sentido -z)		y    x(positivo sentido -x)
+		model = glm::translate(model, glm::vec3(13.8f, 4.7f, 56.0f)); // translate it down so it's at the center of the scene
+		//model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
+		mLightsShader->setMat4("model", model);
 
-		xbox->Draw(*staticShader);
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		xbox->Draw(*mLightsShader);
 	}
 
 	mLightsShader->use(); // Activamos el shader de iluminación
@@ -584,8 +623,9 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(5.0f, 5.0f, 50.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(6.8f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
