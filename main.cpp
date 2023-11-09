@@ -69,7 +69,7 @@ float elapsedTime = 0.0f;
 
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
-glm::vec3 camera1stPersonOffset(0.0f, 4.0f, -1.0f);
+glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f);
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
 
 float     scaleV = 0.5f;
@@ -215,7 +215,7 @@ bool Start() {
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	castle = new Model("models/CastleOpaqueElements.fbx");
+	castle = new Model("models/castilloEnmaquetado.fbx");
 	pillar = new Model("models/pillar.fbx");
 	player = new Model("models/player.fbx");
 	//Nuevos modelos
@@ -227,7 +227,7 @@ bool Start() {
 	//computadora = new Model("models/computadora.fbx");
 	silla = new Model("models/silla.fbx");
 	root = new Model("models/rooflamp.fbx");
-	xbox = new Model("models/xboxone.fbx");
+	xbox = new Model("models/XboxSerieX.fbx");
 	//Modelos aldo
 	n64 = new Model("models/N64.fbx");
 	ps1 = new Model("models/PS1.fbx");
