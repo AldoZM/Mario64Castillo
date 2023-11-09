@@ -221,6 +221,7 @@ bool Start() {
 	//Nuevos modelos
 	mesa = new Model("models/mesa.fbx");
 	sensor = new Model("models/sensor.fbx");
+	sillon = new Model("models/sillon.fbx");
 	//Modelos Carlos
 	librero = new Model("models/librerofinal.fbx");
 	//computadora = new Model("models/computadora.fbx");
@@ -591,10 +592,10 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-1.0f, 4.0f, 45.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-0.4f, 5.5f, 34.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -615,6 +616,42 @@ bool Update() {
 		mLightsShader->setFloat("transparency", material.transparency);
 		sensor->Draw(*mLightsShader);
 	}
+
+
+
+	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
+	{
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(8.0f, 4.0f, 42.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(135.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+		sillon->Draw(*mLightsShader);
+	}
+
 
 
 
