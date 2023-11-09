@@ -366,9 +366,6 @@ bool Update() {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
-
 	// Cubemap (fondo)
 	{
 		mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
@@ -558,6 +555,8 @@ bool Update() {
 		ps1->Draw(*mLightsShader);
 	}
 
+
+	staticShader->use();
 	{
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
 		staticShader->setMat4("projection", projection);
