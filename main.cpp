@@ -103,6 +103,9 @@ Model* xbox;
 Model* n64;
 Model* ps1;
 
+//Modelos Ernesto
+Model* gameBoy;
+
 
 GameObject* gameObjectsPillars[10];
 GameObject* moveObject;
@@ -226,6 +229,7 @@ bool Start() {
 	n64 = new Model("models/N64.fbx");
 	ps1 = new Model("models/PS1.fbx");
 
+	gameBoy = new Model("models/GameBoy.fbx");
 
 	// Cubemap
 	vector<std::string> faces
@@ -574,12 +578,9 @@ bool Update() {
 		ps1->Draw(*mLightsShader);
 	}
 
-<<<<<<< HEAD
 
-	staticShader->use();
-=======
 	mLightsShader->use();
->>>>>>> e1fff088169a910e32745adf621c59794fb025bc
+
 	{
 		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
 		mLightsShader->setMat4("projection", projection);
@@ -651,6 +652,41 @@ bool Update() {
 		n64->Draw(*mLightsShader);
 	}
 
+	mLightsShader->use();
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.8f, 8.0f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		gameBoy->Draw(*mLightsShader);
+	}
 	glUseProgram(0);
 
 	glfwSwapBuffers(window);
