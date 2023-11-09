@@ -72,7 +72,7 @@ glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
 glm::vec3 camera1stPersonOffset(0.0f, 4.0f, -1.0f);
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
 
-float     scaleV = 0.05f;
+float     scaleV = 0.5f;
 float     scaleH = 0.005f;
 float     rotateCharacter = 0.0f;
 
@@ -91,6 +91,8 @@ Model* player;
 // Nuevos modelos
 Model* mesa;
 Model* sensor;
+Model* sillon;
+Model* ventana;
 
 //Modelos carlos
 Model* librero;
@@ -277,16 +279,16 @@ bool Start() {
 
 
 	// Configuración de los archivos a cargar
-	pillarsPositions.push_back(glm::vec3(4.0f, 5.5f, 40.0f));
-	pillarsPositions.push_back(glm::vec3(-5.0f, 5.5f, 40.0f));
-	pillarsPositions.push_back(glm::vec3(2.5f, 5.5f, 53.0f));
-	pillarsPositions.push_back(glm::vec3(-3.5f, 5.5f, 53.0f));
-	pillarsPositions.push_back(glm::vec3(9.0f, 5.5f, 59.5f));
-	pillarsPositions.push_back(glm::vec3(-9.0f, 5.5f, 59.0f));
-	pillarsPositions.push_back(glm::vec3(13.0f, 5.5f, 52.5f));
-	pillarsPositions.push_back(glm::vec3(-14.0f, 5.5f, 53.0f));
-	pillarsPositions.push_back(glm::vec3(8.0f, 10.5f, 64.0f));
-	pillarsPositions.push_back(glm::vec3(-5.0f, 10.5f, 61.0f));
+	pillarsPositions.push_back(glm::vec3(4.0f, 4.25f, 40.0f));
+	pillarsPositions.push_back(glm::vec3(-5.0f, 4.25f, 40.0f));
+	pillarsPositions.push_back(glm::vec3(2.5f, 4.25f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(-3.5f, 4.25f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(9.0f, 4.25f, 59.5f));
+	pillarsPositions.push_back(glm::vec3(-9.0f, 4.25f, 59.0f));
+	pillarsPositions.push_back(glm::vec3(13.0f, 4.25f, 52.5f));
+	pillarsPositions.push_back(glm::vec3(-14.0f, 4.25f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(8.0f, 9.25f, 64.0f));
+	pillarsPositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
 
 	soundEffectsPaths.push_back("audio/ps1.mp3");
 	soundEffectsPaths.push_back("audio/gba.mp3");
@@ -459,7 +461,8 @@ bool Update() {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
 			model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			//								//ancho	//volumen //altura
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 0.4f));	// it's a bit too big for our scene, so scale it down
 			mLightsShader->setMat4("model", model);
 
 			mLightsShader->setInt("numLights", (int)gLights.size());
@@ -560,7 +563,7 @@ bool Update() {
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
+		for (size_t i = 0; i < gLights.size(); ++i){
 			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
 			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
 			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
@@ -577,6 +580,47 @@ bool Update() {
 		mLightsShader->setFloat("transparency", material.transparency);
 		ps1->Draw(*mLightsShader);
 	}
+
+
+
+	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
+	{
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-1.0f, 4.0f, 45.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+		sensor->Draw(*mLightsShader);
+	}
+
+
+
+
+
+
 
 
 	mLightsShader->use();
@@ -663,8 +707,9 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.8f, 8.0f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(6.0f, 5.0f, 58.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-190.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
