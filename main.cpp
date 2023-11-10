@@ -81,13 +81,16 @@ Shader* ourShader;
 Shader* cubemapShader;
 Shader* mLightsShader;
 Shader* staticShader;
-Shader* phongShader;
+Shader* wavesShader;
+Shader* waterfallShader;
 
 // Carga la información del modelo
 Model* castle;
 Model* pillar;
 Model* player;
-
+Model* cascada;
+Model* lago1;
+Model* lago2;
 // Nuevos modelos
 Model* mesa;
 Model* sensor;
@@ -107,6 +110,7 @@ Model* ps1;
 
 //Modelos Ernesto
 Model* gameBoy;
+Model* snes;
 
 
 GameObject* gameObjectsPillars[10];
@@ -136,15 +140,18 @@ int		animationCount = 0;
 float elapsedTime2 = 0.0f;
 
 float proceduralTime = 0.0f;
-float wavesTime = 0.0f;
+float wavesTime = 0.0f; // Variable de tiempo para el agua
+float waterfallTime = 0.0f; // Variable de tiempo para la cascada
+
 float distance; // Variable usada para guardar la distancia entre la camara y un modelo
+float minimalDistanceSounds;
 
 const char* soundPath;
 
 // Audio
 ISoundEngine* SoundEngine = createIrrKlangDevice();
 
-int minimalDistanceAudio = 5;
+int minimalDistanceAudio = 3;
 int minimalDistanceTransforms = 8;
 
 bool disableSounds = false;
@@ -208,6 +215,8 @@ bool Start() {
 	cubemapShader = new Shader("shaders/10_vertex_cubemap.vs", "shaders/10_fragment_cubemap.fs"); // Shader para el cubemap
 	staticShader = new Shader("shaders/10_vertex_simple.vs", "shaders/10_fragment_simple.fs"); // Shader sin fuentes de iluminaciòn
 	mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs"); // Shader para multiples fuentes de iluminaciòn
+	wavesShader = new Shader("shaders/wavesAnimation.vs", "shaders/wavesAnimation.fs"); // Shader para la el agua
+	waterfallShader = new Shader("shaders/waterfallAnimation.vs", "shaders/waterfallAnimation.fs"); // Shader para la cascada
 
 	// Máximo número de huesos: 100
 	ourShader->setBonesIDs(MAX_RIGGING_BONES);
@@ -216,8 +225,12 @@ bool Start() {
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
 	castle = new Model("models/castilloEnmaquetado.fbx");
-	pillar = new Model("models/pillar.fbx");
+	pillar = new Model("models/pilarGriego.fbx");
 	player = new Model("models/player.fbx");
+	cascada = new Model("models/cascada.fbx");
+	lago1 = new Model("models/agua1.fbx");
+	lago2 = new Model("models/agua2.fbx");
+
 	//Nuevos modelos
 	mesa = new Model("models/mesa.fbx");
 	sensor = new Model("models/sensor.fbx");
@@ -233,6 +246,7 @@ bool Start() {
 	ps1 = new Model("models/PS1.fbx");
 
 	gameBoy = new Model("models/GameBoy.fbx");
+	snes = new Model("models/SNES.fbx");
 
 	// Cubemap
 	vector<std::string> faces
@@ -267,7 +281,7 @@ bool Start() {
 	light.Position = glm::vec3(4.0f, 20.0f, 53.0f);
 	light.Color = glm::vec4(0.2f, 0.0f, 0.0f, 1.0f);
 	// mainLight.alphaIndex = 13; // àngulo de rotaciòn
-	gLights.push_back(light);
+	//gLights.push_back(light);
 
 	Light light02;
 	light02.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
@@ -312,6 +326,8 @@ bool Start() {
 	}
 	// RGBa (Red, Green, Blue and Alpha)
 	SoundEngine->play2D("audio/gta.mp3");
+
+	minimalDistanceAudio = 5;
 	return true;
 }
 
@@ -399,8 +415,74 @@ bool Update() {
 		castle->Draw(*staticShader);
 	}
 
-	glUseProgram(0);
+	{
+		// Activamos el shader de Phong
+		waterfallShader->use();
 
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		waterfallShader->setMat4("projection", projection);
+		waterfallShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		waterfallShader->setMat4("model", model);
+
+		waterfallShader->setFloat("time", waterfallTime);
+
+		cascada->Draw(*waterfallShader);
+		waterfallTime += 0.001;
+	}
+
+	{
+		// Activamos el shader de Phong
+		wavesShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		wavesShader->setMat4("projection", projection);
+		wavesShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		wavesShader->setMat4("model", model);
+
+		wavesShader->setFloat("time", wavesTime);
+
+		lago1->Draw(*wavesShader);
+		
+		wavesTime += 0.001;
+	}
+
+	{
+		staticShader->use();
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Activamos el shader del plano
+		staticShader->setMat4("view", view);
+		staticShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+
+		lago2->Draw(*staticShader);
+	}
 
 	{
 		// Activación del shader del personaje
@@ -652,14 +734,6 @@ bool Update() {
 		sillon->Draw(*mLightsShader);
 	}
 
-
-
-
-
-
-
-
-
 	mLightsShader->use();
 
 	{
@@ -768,6 +842,40 @@ bool Update() {
 		mLightsShader->setFloat("transparency", material.transparency);
 
 		gameBoy->Draw(*mLightsShader);
+	}
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.0f, 5.0f, 50.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		snes->Draw(*mLightsShader);
 	}
 	glUseProgram(0);
 
