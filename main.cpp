@@ -280,14 +280,14 @@ bool Start() {
 
 
 	// Configuración de los archivos a cargar
-	pillarsPositions.push_back(glm::vec3(4.0f, 4.25f, 40.0f));
+	pillarsPositions.push_back(glm::vec3(4.0f, 4.25f, 41.0f));//z y x
 	pillarsPositions.push_back(glm::vec3(-5.0f, 4.25f, 40.0f));
 	pillarsPositions.push_back(glm::vec3(2.5f, 4.25f, 53.0f));
-	pillarsPositions.push_back(glm::vec3(-3.5f, 4.25f, 53.0f));
-	pillarsPositions.push_back(glm::vec3(9.0f, 4.25f, 59.5f));
-	pillarsPositions.push_back(glm::vec3(-9.0f, 4.25f, 59.0f));
-	pillarsPositions.push_back(glm::vec3(13.0f, 4.25f, 52.5f));
-	pillarsPositions.push_back(glm::vec3(-14.0f, 4.25f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+	pillarsPositions.push_back(glm::vec3(9.9f, 4.25f, 61.7f));//izwuierda enfrente
+	pillarsPositions.push_back(glm::vec3(-11.0f, 4.25f, 61.2f));//enfrente,x negativa
+	pillarsPositions.push_back(glm::vec3(13.0f, 4.25f, 53.0f));//izquierda atras
+	pillarsPositions.push_back(glm::vec3(-14.5f, 4.25f, 54.0f));//atras, xnegativo
 	pillarsPositions.push_back(glm::vec3(8.0f, 9.25f, 64.0f));
 	pillarsPositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
 
@@ -513,8 +513,8 @@ bool Update() {
 		mesa->Draw(*staticShader);
 
 		//Mesa 4
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-14.0f, 4.1f, 56.0f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);				//-x en sentido de -z    // +z en sentido de -x
+		model = glm::translate(model, glm::vec3(-14.7f, 4.1f, 58.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
@@ -522,9 +522,9 @@ bool Update() {
 
 		//Mesa 3
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-7.0f, 4.1f, 57.5f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-8.0f, 4.1f, 59.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(120.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(130.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		mesa->Draw(*staticShader);
