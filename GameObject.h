@@ -3,14 +3,15 @@
 
 #include "glm/glm.hpp"
 #include "string"
-
+#include <model.h>
 class GameObject {
 public:
 
 	GameObject(float x, float y, float z, std::string soundPath);
-	GameObject(glm::vec3 position, std::string soundPath);
+	GameObject(glm::vec3 position, std::string soundPath, Model* text);
 	//GameObject(Model* model, Shader* shader);
 	glm::vec3 getObjectPosition() const;
+	Model* gettextPath() const;
 	std::string getSoundPath() const;
 	const char * getSoundPathC() const;
 	void moveObjectPosition(float escalar);
@@ -23,6 +24,7 @@ public:
 private:
 	glm::vec3 objectPosition;
 	std::string soundEffectPath;
+	Model* textPath;
 	/*glm::vec3 objectScale;
 	glm::vec3 objectRotation;
 	Model *objectModel;

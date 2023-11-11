@@ -147,6 +147,7 @@ float distance; // Variable usada para guardar la distancia entre la camara y un
 float minimalDistanceSounds;
 
 const char* soundPath;
+Model* textPathc;
 
 // Audio
 ISoundEngine* SoundEngine = createIrrKlangDevice();
@@ -177,7 +178,7 @@ int main()
 bool Start() {
 	std::vector<glm::vec3> pillarsPositions; // Arreglo para guardar las posiciones de los pilares
 	std::vector <std::string> soundEffectsPaths; // Arreglo para guardar las direcciones de los efectos de sonido
-
+	std::vector <std::string> textPaths;
 	// Inicialización de GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -316,13 +317,26 @@ bool Start() {
 	soundEffectsPaths.push_back("audio/ok.mp3");
 	soundEffectsPaths.push_back("audio/oof.mp3");
 
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+	textPaths.push_back("models/n64.fbx");
+
 	glm::vec3 position;
 	std::string soundEffectPath;
+	Model* textPath;
 	for (size_t i = 0; i < MAX_PILLARS; i++)
 	{
 		position = pillarsPositions.at(i);
 		soundEffectPath = soundEffectsPaths.at(i);
-		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
+		textPath = new Model(textPaths.at(i));
+		gameObjectsPillars[i] = new GameObject(position, soundEffectPath, textPath); // Iniciamos los game objects
 	}
 	// RGBa (Red, Green, Blue and Alpha)
 	SoundEngine->play2D("audio/gta.mp3");
@@ -539,6 +553,17 @@ bool Update() {
 			if (distance < minimalDistanceTransforms) {
 				moveObject = gameObjectsPillars[i];
 				objectPosition = gameObjectsPillars[i]->getObjectPosition();
+			}
+
+
+			if (distance < minimalDistanceAudio) {
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
+				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+				//model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 1.0f));
+				model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+				staticShader->setMat4("model", model);
+				textPathc->Draw(*staticShader);
 			}
 
 			model = glm::mat4(1.0f);
