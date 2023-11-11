@@ -294,13 +294,13 @@ bool Start() {
 
 
 	// Configuración de los archivos a cargar
-	pillarsPositions.push_back(glm::vec3(4.0f, 4.25f, 41.0f));//z y x
-	pillarsPositions.push_back(glm::vec3(-5.0f, 4.25f, 40.0f));
-	pillarsPositions.push_back(glm::vec3(2.5f, 4.25f, 53.0f));
+	pillarsPositions.push_back(glm::vec3(4.0f, 4.25f, 41.0f));//z y x //centro-atras izquierda
+	pillarsPositions.push_back(glm::vec3(-5.0f, 4.25f, 40.0f));//centro-atras derecha
+	pillarsPositions.push_back(glm::vec3(2.5f, 4.25f, 53.0f));//centro-frente izquierda
 	pillarsPositions.push_back(glm::vec3(-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-	pillarsPositions.push_back(glm::vec3(9.9f, 4.25f, 61.7f));//izwuierda enfrente
+	pillarsPositions.push_back(glm::vec3(10.1f, 4.25f, 61.5f));//izwuierda enfrente
 	pillarsPositions.push_back(glm::vec3(-11.0f, 4.25f, 61.2f));//enfrente,x negativa
-	pillarsPositions.push_back(glm::vec3(13.0f, 4.25f, 53.0f));//izquierda atras
+	pillarsPositions.push_back(glm::vec3(12.5f, 4.25f, 53.5f));//izquierda atras
 	pillarsPositions.push_back(glm::vec3(-14.5f, 4.25f, 54.0f));//atras, xnegativo
 	pillarsPositions.push_back(glm::vec3(8.0f, 9.25f, 64.0f));
 	pillarsPositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
