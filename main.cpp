@@ -131,6 +131,8 @@ CubeMap* mainCubeMap;
 
 // Materiales
 Material material;
+Material oro;
+Material silver;
 
 // Light gLight;
 std::vector<Light> gLights;
@@ -192,6 +194,16 @@ int main()
 }
 
 bool Start() {
+	oro.ambient = glm::vec4(0.24725f, 0.1995f, 0.0745, 1.0f);
+	oro.diffuse = glm::vec4(0.75164f, 0.60648f, 0.22648f, 1.0f);
+	oro.specular = glm::vec4(0.628281f, 0.555802f, 0.366065f, 1.0f);
+	oro.transparency = 1.0f;
+
+	silver.ambient = glm::vec4(0.19225f, 0.19225f, 0.19225f, 1.0f);
+	silver.diffuse = glm::vec4(0.50754f, 0.50754f, 0.50754f, 1.0f);
+	silver.specular = glm::vec4(0.508273f, 0.508273f, 0.508273f, 1.0f);
+	silver.transparency = 1.0f;
+
 	std::vector<glm::vec3> pillarsPositions; // Arreglo para guardar las posiciones de los pilares
 	std::vector <std::string> soundEffectsPaths; // Arreglo para guardar las direcciones de los efectos de sonido
 	std::vector <std::string > textPaths;
@@ -661,10 +673,10 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa2
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-10.0f, 6.0f, 42.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-10.0f, 6.3f, 43.0f)); // translate it down so it's at the center of the scene
 		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.0005f, 0.0005f, 0.0005f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.00045f, 0.00047f, 0.00047f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		librero->Draw(*staticShader);
 	}
@@ -858,10 +870,10 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//Computadora
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.8f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(6.6f, 5.0f, 58.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.0003f, 0.0003f, 0.0003f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.0002f, 0.0002f, 0.0002f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -876,10 +888,10 @@ bool Update() {
 
 		mLightsShader->setVec3("eye", activeCamera->Position);
 
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
+		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
+		mLightsShader->setFloat("transparency", silver.transparency);
 
 		computadora->Draw(*mLightsShader);
 	}
@@ -1171,9 +1183,11 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-		model = glm::translate(model, glm::vec3(18.0f, 8.15f, 53.8f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-0.4f, 3.6f, 50.7f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -1188,14 +1202,87 @@ bool Update() {
 
 		mLightsShader->setVec3("eye", activeCamera->Position);
 
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
+		mLightsShader->setVec4("MaterialAmbientColor", oro.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", oro.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", oro.specular);
+		mLightsShader->setFloat("transparency", oro.transparency);
 
 		valla->Draw(*mLightsShader);
 	}
 
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-0.4f, 20.1, 50.7f)); // translate it down so it's at the center of the scene
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
+		mLightsShader->setFloat("transparency", silver.transparency);
+
+		root->Draw(*mLightsShader);
+	}
+
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-0.4f, 20.1, 60.7f)); // translate it down so it's at the center of the scene
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
+		mLightsShader->setFloat("transparency", silver.transparency);
+
+		root->Draw(*mLightsShader);
+	}
 
 
 	{
