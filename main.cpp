@@ -242,7 +242,7 @@ bool Start() {
 	sillon = new Model("models/sillon.fbx");
 	//Modelos Carlos
 	librero = new Model("models/librero.fbx");
-	//computadora = new Model("models/computadora.fbx");
+	computadora = new Model("models/computadora.fbx");
 	silla = new Model("models/silla.fbx");
 	root = new Model("models/rooflamp.fbx");
 	xbox = new Model("models/XboxSerieX.fbx");
@@ -841,6 +841,43 @@ bool Update() {
 		mLightsShader->setFloat("transparency", material.transparency);
 
 		n64->Draw(*mLightsShader);
+	}
+
+	mLightsShader->use(); // Activamos el shader de iluminación
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//Computadora
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.8f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0003f, 0.0003f, 0.0003f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		computadora->Draw(*mLightsShader);
 	}
 
 	mLightsShader->use();
