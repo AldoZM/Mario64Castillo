@@ -71,6 +71,7 @@ glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
 glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f);
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
+glm::vec3 textInfoOffset(0.0f, 0.0f, 0.0f);
 
 float     scaleV = 0.5f;
 float     scaleH = 0.005f;
@@ -120,6 +121,8 @@ Model* atari;
 Model* gameCube;
 Model* nes;
 
+
+Model* textInfo[11];
 GameObject* gameObjectsPillars[10];
 GameObject* moveObject;
 
@@ -154,6 +157,7 @@ float distance; // Variable usada para guardar la distancia entre la camara y un
 float minimalDistanceSounds;
 
 const char* soundPath;
+Model* textPathc;
 
 float lightDirectionX;
 float lightDirectionY;
@@ -165,6 +169,9 @@ int minimalDistanceAudio = 3;
 int minimalDistanceTransforms = 8;
 
 bool disableSounds = false;
+bool disableText = false;
+
+
 
 // Entrada a función principal
 int main()
@@ -187,7 +194,7 @@ int main()
 bool Start() {
 	std::vector<glm::vec3> pillarsPositions; // Arreglo para guardar las posiciones de los pilares
 	std::vector <std::string> soundEffectsPaths; // Arreglo para guardar las direcciones de los efectos de sonido
-
+	std::vector <std::string > textPaths;
 	// Inicialización de GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -247,8 +254,8 @@ bool Start() {
 	sensor = new Model("models/sensor.fbx");
 	sillon = new Model("models/sillon.fbx");
 	//Modelos Carlos
-	librero = new Model("models/librerofinal.fbx");
-	//computadora = new Model("models/computadora.fbx");
+	librero = new Model("models/librero.fbx");
+	computadora = new Model("models/computadora.fbx");
 	silla = new Model("models/silla.fbx");
 	root = new Model("models/rooflamp.fbx");
 	xbox = new Model("models/XboxSerieX.fbx");
@@ -336,12 +343,27 @@ bool Start() {
 	soundEffectsPaths.push_back("audio/ok.mp3");
 	soundEffectsPaths.push_back("audio/oof.mp3");
 
+
+	textPaths.push_back("models/textatari.fbx");
+	textPaths.push_back("models/textgameboy.fbx");
+	textPaths.push_back("models/textgamecube.fbx");
+	textPaths.push_back("models/textN64.fbx");
+	textPaths.push_back("models/textnes.fbx");
+	textPaths.push_back("models/textplay1.fbx");
+	textPaths.push_back("models/textps2.fbx");
+	textPaths.push_back("models/textpsp.fbx");
+	textPaths.push_back("models/textsnes.fbx");
+	textPaths.push_back("models/textwii.fbx");
+	textPaths.push_back("models/textxbox.fbx");
+
 	glm::vec3 position;
 	std::string soundEffectPath;
+	
 	for (size_t i = 0; i < MAX_PILLARS; i++)
 	{
 		position = pillarsPositions.at(i);
 		soundEffectPath = soundEffectsPaths.at(i);
+		textInfo[i] = new Model(textPaths.at(i));
 		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
 	}
 	// RGBa (Red, Green, Blue and Alpha)
@@ -536,11 +558,27 @@ bool Update() {
 			if (distance < minimalDistanceAudio && !SoundEngine->isCurrentlyPlaying(soundPath) && !disableSounds) {
 				SoundEngine->stopAllSounds();
 				SoundEngine->play2D(soundPath);
+
 			}
 			if (distance < minimalDistanceTransforms) {
 				moveObject = gameObjectsPillars[i];
 				objectPosition = gameObjectsPillars[i]->getObjectPosition();
 			}
+			
+			if (distance < minimalDistanceAudio && !disableText) {
+				model = glm::mat4(1.0f);
+				
+				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.81f)); // translate it down so it's at the center of the scene
+				//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
+				model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+				
+				model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+				staticShader->setMat4("model", model);
+				textInfo[i]->Draw(*staticShader);
+			}
+
+			
 
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
@@ -625,9 +663,9 @@ bool Update() {
 		//mesa2
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(-10.0f, 6.0f, 42.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0005f, 0.0005f, 0.0005f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		librero->Draw(*staticShader);
 	}
@@ -808,6 +846,43 @@ bool Update() {
 		mLightsShader->setFloat("transparency", material.transparency);
 
 		n64->Draw(*mLightsShader);
+	}
+
+	mLightsShader->use(); // Activamos el shader de iluminación
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//Computadora
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.8f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0003f, 0.0003f, 0.0003f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		computadora->Draw(*mLightsShader);
 	}
 
 	mLightsShader->use();
@@ -1215,7 +1290,7 @@ void processInput(GLFWwindow* window)
 		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		forwardView = glm::vec3(viewVector);
 		forwardView = glm::normalize(forwardView);
-
+		
 		camera1st.Front = forwardView;
 		camera1st.Position = playerPosition;
 		camera1st.Position += camera1stPersonOffset;
@@ -1228,7 +1303,7 @@ void processInput(GLFWwindow* window)
 		glm::vec4 viewVector = model * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		forwardView = glm::vec3(viewVector);
 		forwardView = glm::normalize(forwardView);
-
+		
 		camera1st.Front = forwardView;
 		camera1st.Position = playerPosition;
 		camera1st.Position += camera1stPersonOffset;

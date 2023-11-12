@@ -1,5 +1,5 @@
 #include "GameObject.h"
-#include <glm/glm.hpp>
+
 #include <glm/gtx/string_cast.hpp>
 
 
@@ -15,6 +15,7 @@ GameObject::GameObject(float x, float y, float z, std::string soundPath = "") {
 GameObject::GameObject(glm::vec3 position, std::string soundPath = "") {
 	this->objectPosition = position;
 	this->soundEffectPath = soundPath;
+
 }
 
 glm::vec3 GameObject::getObjectPosition() const {
@@ -41,6 +42,8 @@ std::string GameObject::getSoundPath() const {
 const char* GameObject::getSoundPathC() const {
 	return this->soundEffectPath.c_str();
 }
+
+
 //Model* GameObject::getModel() const {
 //	return this->objectModel;
 //}
