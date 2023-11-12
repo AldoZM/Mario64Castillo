@@ -91,7 +91,7 @@ Model* pillar;
 Model* player;
 Model* cascada;
 Model* lago1;
-Model* lago2;
+Model* valla;
 // Nuevos modelos
 Model* mesa;
 Model* sensor;
@@ -109,6 +109,9 @@ Model* xbox;
 Model* n64;
 Model* ps1;
 Model* wii;
+Model* psp;
+Model* ps2;
+
 
 //Modelos Ernesto
 Model* gameBoy;
@@ -234,6 +237,7 @@ bool Start() {
 	player = new Model("models/player.fbx");
 	cascada = new Model("models/cascada.fbx");
 	lago1 = new Model("models/AguaRefinado.fbx");
+	// valla = new Model("models/Barra.fbx");
 
 	//Nuevos modelos
 	mesa = new Model("models/mesa.fbx");
@@ -249,6 +253,8 @@ bool Start() {
 	n64 = new Model("models/N64.fbx");
 	ps1 = new Model("models/PS1.fbx");
 	wii = new Model("models/Wii.fbx");
+	psp = new Model("models/PSP.fbx");
+	ps2 = new Model("models/PS2.fbx");
 
 	gameBoy = new Model("models/GameBoy.fbx");
 	snes = new Model("models/SNES.fbx");
@@ -1006,6 +1012,108 @@ bool Update() {
 
 		wii->Draw(*mLightsShader);
 	}
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(12.0f, 8.15f, 53.8f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		psp->Draw(*mLightsShader);
+	}
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-12.0, 8.15f, 53.8f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		ps2->Draw(*mLightsShader);
+	}
+
+	//{
+	//	// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+	//	mLightsShader->setMat4("projection", projection);
+	//	mLightsShader->setMat4("view", view);
+
+	//	// Aplicamos transformaciones del modelo
+	//	//mesa1
+	//	model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+	//	model = glm::translate(model, glm::vec3(18.0f, 8.15f, 53.8f)); // translate it down so it's at the center of the scene
+	//	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+	//	mLightsShader->setMat4("model", model);
+
+	//	mLightsShader->setInt("numLights", (int)gLights.size());
+	//	for (size_t i = 0; i < gLights.size(); ++i) {
+	//		SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+	//		SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+	//		SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+	//		SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+	//		SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+	//		SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+	//	}
+
+	//	mLightsShader->setVec3("eye", activeCamera->Position);
+
+	//	mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+	//	mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+	//	mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+	//	mLightsShader->setFloat("transparency", material.transparency);
+
+	//	valla->Draw(*mLightsShader);
+	//}
 	glUseProgram(0);
 
 	glfwSwapBuffers(window);
