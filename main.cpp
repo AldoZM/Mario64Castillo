@@ -86,6 +86,7 @@ Shader* waterfallShader;
 
 // Carga la información del modelo
 Model* castle;
+Model* castleTransparent;
 Model* pillar;
 Model* player;
 Model* cascada;
@@ -224,7 +225,8 @@ bool Start() {
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	castle = new Model("models/castilloSinCascada.fbx");
+	castle = new Model("models/castilloMaquetado2.fbx");
+	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
 	player = new Model("models/player.fbx");
 	cascada = new Model("models/cascada.fbx");
@@ -412,6 +414,7 @@ bool Update() {
 		staticShader->setMat4("model", model);
 
 		castle->Draw(*staticShader);
+		castleTransparent->Draw(*staticShader);
 	}
 
 	{
