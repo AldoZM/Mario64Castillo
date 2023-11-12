@@ -133,6 +133,7 @@ CubeMap* mainCubeMap;
 Material material;
 Material oro;
 Material silver;
+Material plastic;
 
 // Light gLight;
 std::vector<Light> gLights;
@@ -203,6 +204,11 @@ bool Start() {
 	silver.diffuse = glm::vec4(0.50754f, 0.50754f, 0.50754f, 1.0f);
 	silver.specular = glm::vec4(0.508273f, 0.508273f, 0.508273f, 1.0f);
 	silver.transparency = 1.0f;
+
+	plastic.ambient = glm::vec4(0.0f, 0.0f, 0.0f, 0.25f);
+	plastic.diffuse = glm::vec4(0.55f, 0.55f, 0.55f, 0.25f);
+	plastic.specular = glm::vec4(0.70f, 0.70f, 0.70f, 0.25f);
+	plastic.transparency = 1.0f;
 
 	std::vector<glm::vec3> pillarsPositions; // Arreglo para guardar las posiciones de los pilares
 	std::vector <std::string> soundEffectsPaths; // Arreglo para guardar las direcciones de los efectos de sonido
@@ -923,10 +929,10 @@ bool Update() {
 
 		mLightsShader->setVec3("eye", activeCamera->Position);
 
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
+		mLightsShader->setVec4("MaterialAmbientColor", plastic.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", plastic.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", plastic.specular);
+		mLightsShader->setFloat("transparency", plastic.transparency);
 
 		silla->Draw(*mLightsShader);
 	}
