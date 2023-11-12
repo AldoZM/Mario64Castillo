@@ -7,15 +7,18 @@
 //	this->objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 //}
 
-GameObject::GameObject(float x, float y, float z, std::string soundPath = "") {
+GameObject::GameObject(float x, float y, float z, 
+					std::string soundPath = "", 
+					glm::vec3 angles = glm::vec3(0.0f, -90.0f, 0.0f)) {
 	this->objectPosition = glm::vec3(x, y, z);
 	this->soundEffectPath = soundPath;
+	this->objectAngles = angles;
 }
 
 GameObject::GameObject(glm::vec3 position, std::string soundPath = "") {
 	this->objectPosition = position;
 	this->soundEffectPath = soundPath;
-
+	this->objectAngles = glm::vec3(0.0f, -90.0f, 0.0f);
 }
 
 glm::vec3 GameObject::getObjectPosition() const {
@@ -29,6 +32,20 @@ void GameObject::moveObjectPosition(float escalar) {
 void GameObject::moveObjectPosition(float x, float y, float z) {
 	glm::vec3 vectorToAdd = glm::vec3(x, y, z);
 	this->objectPosition += vectorToAdd;
+}
+
+void GameObject::rotateObjectZ(float angleToAdd) {
+	this->objectAngles.z += angleToAdd;
+	if ((int)this->objectAngles.z > 360) {
+		this->objectAngles.z = 0.0f;
+	}
+	else if ((int)this->objectAngles.z < 0) {
+		this->objectAngles.z = 360.0f;
+	}
+}
+
+float GameObject::getAngleZ() const {
+	return this->objectAngles.z;
 }
 
 std::string GameObject::toString() const {

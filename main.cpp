@@ -568,7 +568,9 @@ bool Update() {
 			mLightsShader->setMat4("view", view);
 
 			glm::vec3 objectPosition = gameObjectsPillars[i]->getObjectPosition();
+			float objectRotationY = gameObjectsPillars[i]->getAngleZ();
 			auto distance = glm::length(playerPosition - objectPosition);
+
 
 
 			soundPath = gameObjectsPillars[i]->getSoundPathC();
@@ -600,7 +602,7 @@ bool Update() {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
 			model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			//								//ancho	//volumen //altura
+			model = glm::rotate(model, glm::radians(objectRotationY), glm::vec3(0.0, 0.0f, 1.0f));
 			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 0.4f));	// it's a bit too big for our scene, so scale it down
 			mLightsShader->setMat4("model", model);
 
@@ -1380,27 +1382,15 @@ void processInput(GLFWwindow* window)
 		camera3rd.ProcessKeyboard(RIGHT, deltaTime);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) {}
-
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {}
-
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {}
-
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {}
-
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {}
-
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {}
-
 	// Funciòn para mover un objeto en z hacìa el lado negativo
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
 		if (moveObject != NULL) {
 			moveObject->moveObjectPosition(0.0f, 0.0f, -0.01f);
 		}
@@ -1409,7 +1399,7 @@ void processInput(GLFWwindow* window)
 	}
 
 	// Funciòn para mover un objeto en z hacìa el lado positivo
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
 		if (moveObject != NULL) {
 			moveObject->moveObjectPosition(0.0f, 0.0f, 0.01f);
 		}
@@ -1417,6 +1407,39 @@ void processInput(GLFWwindow* window)
 		moveObject = NULL;
 	}
 
+	// Funciòn para mover un objeto en x hacìa el lado positivo
+	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) {
+		if (moveObject != NULL) {
+			moveObject->moveObjectPosition(0.01f, 0.0f, 0.0f);
+		}
+
+		moveObject = NULL;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+		if (moveObject != NULL) {
+			moveObject->moveObjectPosition(-0.01f, 0.0f, 0.0f);
+		}
+
+		moveObject = NULL;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+		if (moveObject != NULL) {
+			moveObject->rotateObjectZ(0.1f);
+		}
+
+		moveObject = NULL;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+		if (moveObject != NULL) {
+			moveObject->rotateObjectZ(-0.1f);
+		}
+
+		moveObject = NULL;
+	}
+	
 
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {

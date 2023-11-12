@@ -7,7 +7,7 @@
 class GameObject {
 public:
 
-	GameObject(float x, float y, float z, std::string soundPath);
+	GameObject(float x, float y, float z, std::string soundPath, glm::vec3 angles);
 	GameObject(glm::vec3 position, std::string soundPath);
 	//GameObject(Model* model, Shader* shader);
 	glm::vec3 getObjectPosition() const;
@@ -15,6 +15,8 @@ public:
 	const char * getSoundPathC() const;
 	void moveObjectPosition(float escalar);
 	void moveObjectPosition(float x, float y, float z);
+	void rotateObjectZ(float angleToAdd);
+	float getAngleZ() const;
 	std::string toString() const;
 	//Model *getModel() const;
 	//Shader* getShader() const;
@@ -22,6 +24,7 @@ public:
 
 private:
 	glm::vec3 objectPosition;
+	glm::vec3 objectAngles;
 	std::string soundEffectPath;
 	/*glm::vec3 objectScale;
 	glm::vec3 objectRotation;
