@@ -618,9 +618,10 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-1.0f, 3.0f, 45.0f)); // translate it down so it's at the center of the scene
-
+		model = glm::mat4(1.0f);			//z(positivo en +z)   y   x(positivo en -x)
+		model = glm::translate(model, glm::vec3(-14.7f, 4.9f, 58.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
@@ -760,9 +761,9 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.8f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-8.0f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
