@@ -433,7 +433,6 @@ bool Update() {
 		staticShader->setMat4("model", model);
 
 		castle->Draw(*staticShader);
-		castleTransparent->Draw(*staticShader);
 	}
 
 	{
@@ -1121,6 +1120,31 @@ bool Update() {
 
 		valla->Draw(*mLightsShader);
 	}
+
+
+
+	{
+		staticShader->use();
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Activamos el shader del plano
+		staticShader->setMat4("view", view);
+		staticShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+
+		
+		castleTransparent->Draw(*staticShader);
+	}
+
+
 	glUseProgram(0);
 
 	glfwSwapBuffers(window);
