@@ -112,6 +112,9 @@ Model* ps1;
 //Modelos Ernesto
 Model* gameBoy;
 Model* snes;
+Model* atari;
+Model* gameCube;
+Model* nes;
 
 
 GameObject* gameObjectsPillars[10];
@@ -225,7 +228,7 @@ bool Start() {
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	castle = new Model("models/castilloMaquetado2.fbx");
+	castle = new Model("models/CastilloMaquetado2.fbx");
 	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
 	player = new Model("models/player.fbx");
@@ -248,6 +251,10 @@ bool Start() {
 
 	gameBoy = new Model("models/GameBoy.fbx");
 	snes = new Model("models/SNES.fbx");
+	atari = new Model("models/Atari.fbx");
+	gameCube = new Model("models/Gamecube.fbx");
+	// nes = new Model("models/NES.fbx");
+
 
 	// Cubemap
 	vector<std::string> faces
@@ -860,6 +867,74 @@ bool Update() {
 		mLightsShader->setFloat("transparency", material.transparency);
 
 		snes->Draw(*mLightsShader);
+	}
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 10.0f, 50.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		gameCube->Draw(*mLightsShader);
+	}
+
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.0f, 10.0f, 50.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec3("eye", activeCamera->Position);
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		atari->Draw(*mLightsShader);
 	}
 	glUseProgram(0);
 
