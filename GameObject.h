@@ -15,8 +15,12 @@ public:
 	const char * getSoundPathC() const;
 	void moveObjectPosition(float escalar);
 	void moveObjectPosition(float x, float y, float z);
+<<<<<<< HEAD
 	void rotateObjectZ(float angleToAdd);
 	float getAngleZ() const;
+=======
+	void rotateObject(float angleToAdd);
+>>>>>>> 3c6362538cdd39e3d144ade95fe1c31b22c15c69
 	std::string toString() const;
 	//Model *getModel() const;
 	//Shader* getShader() const;
