@@ -155,6 +155,9 @@ float minimalDistanceSounds;
 
 const char* soundPath;
 
+float lightDirectionX;
+float lightDirectionY;
+
 // Audio
 ISoundEngine* SoundEngine = createIrrKlangDevice();
 
@@ -294,19 +297,21 @@ bool Start() {
 
 	Light light;
 	light.Position = glm::vec3(4.0f, 20.0f, 53.0f);
-	light.Color = glm::vec4(0.2f, 0.0f, 0.0f, 1.0f);
-	// mainLight.alphaIndex = 13; // àngulo de rotaciòn
-	//gLights.push_back(light);
+	light.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
+	light.Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	gLights.push_back(light);
 
 	Light light02;
 	light02.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
-	light02.Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	light02.Direction = glm::vec3(1.0f, 0.0f, 0.0f);
+	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 1.0f);
+
 	gLights.push_back(light02);
 	
 
 	// Configuración de la camara
 	activeCamera = &camera3rd; // Se activa la camara en tercera persona
-
 
 	// Configuración de los archivos a cargar
 	pillarsPositions.push_back(glm::vec3(4.0f, 4.25f, 41.0f));//z y x //centro-atras izquierda
@@ -1252,6 +1257,26 @@ void processInput(GLFWwindow* window)
 			disableSounds = !disableSounds;
 			elapsedTime2 = 0.0f;
 		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+		gLights[0].Direction.x += 0.01f;
+		std::cout << glm::to_string(gLights[0].Direction) << std::endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+		gLights[0].Direction.x -= 0.01f;
+		std::cout << glm::to_string(gLights[0].Direction) << std::endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+		gLights[0].Direction.y += 0.01f;
+		std::cout << glm::to_string(gLights[0].Direction) << std::endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+		gLights[0].Direction.y -= 0.01f;
+		std::cout << glm::to_string(gLights[0].Direction) << std::endl;
 	}
 }
 

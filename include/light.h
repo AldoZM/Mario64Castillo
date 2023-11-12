@@ -21,7 +21,7 @@ public:
 	Light(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-		glm::vec4 power = glm::vec4(250.0f, 250.0f, 250.0f, 1.0f),
+		glm::vec4 power = glm::vec4(150.0f, 150.0f, 150.0f, 1.0f),
 		int alphaIndex = 10, 
 		float distance = 10.0f) 
 	{
