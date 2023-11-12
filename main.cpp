@@ -113,7 +113,7 @@ Model* ps1;
 Model* gameBoy;
 Model* snes;
 
-Model* textInfo[10];
+Model* textInfo[11];
 GameObject* gameObjectsPillars[10];
 GameObject* moveObject;
 
@@ -322,16 +322,17 @@ bool Start() {
 	soundEffectsPaths.push_back("audio/oof.mp3");
 
 
+	textPaths.push_back("models/textatari.fbx");
+	textPaths.push_back("models/textgameboy.fbx");
+	textPaths.push_back("models/textgamecube.fbx");
 	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textN64.fbx");
+	textPaths.push_back("models/textnes.fbx");
+	textPaths.push_back("models/textplay1.fbx");
+	textPaths.push_back("models/textps2.fbx");
+	textPaths.push_back("models/textpsp.fbx");
+	textPaths.push_back("models/textsnes.fbx");
+	textPaths.push_back("models/textwii.fbx");
+	textPaths.push_back("models/textxbox.fbx");
 
 	glm::vec3 position;
 	std::string soundEffectPath;
@@ -564,7 +565,7 @@ bool Update() {
 			if (distance < minimalDistanceAudio && !disableText) {
 				model = glm::mat4(1.0f);
 				
-				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.85f)); // translate it down so it's at the center of the scene
+				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.81f)); // translate it down so it's at the center of the scene
 				//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
 				model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 				model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
