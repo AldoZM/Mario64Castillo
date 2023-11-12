@@ -225,7 +225,7 @@ bool Start() {
 	// Dibujar en malla de alambre
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	castle = new Model("models/castilloMaquetado2.fbx");
+	castle = new Model("models/CastilloMaquetado2.fbx");
 	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
 	player = new Model("models/player.fbx");
