@@ -15,6 +15,7 @@ public:
 	const char * getSoundPathC() const;
 	void moveObjectPosition(float escalar);
 	void moveObjectPosition(float x, float y, float z);
+	void rotateObject(float angleToAdd);
 	std::string toString() const;
 	//Model *getModel() const;
 	//Shader* getShader() const;
@@ -22,6 +23,7 @@ public:
 
 private:
 	glm::vec3 objectPosition;
+	glm::vec3 objectAngles;
 	std::string soundEffectPath;
 	/*glm::vec3 objectScale;
 	glm::vec3 objectRotation;

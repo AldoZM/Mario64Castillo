@@ -31,6 +31,16 @@ void GameObject::moveObjectPosition(float x, float y, float z) {
 	this->objectPosition += vectorToAdd;
 }
 
+void GameObject::rotateObject(float angleToAdd) {
+	this->objectAngles.z += angleToAdd;
+	if ((int)this->objectAngles.z > 360) {
+		this->objectAngles.z = 0.0f;
+	}
+	else if ((int)this->objectAngles.z < 0) {
+		this->objectAngles.z = 360.0f;
+	}
+}
+
 std::string GameObject::toString() const {
 	return "Posicion: " + glm::to_string(this->objectPosition) + " SoundPath: " + this->soundEffectPath;
 }
