@@ -629,10 +629,10 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);			//z(positivo en +z)   y   x(positivo en -x)
-		model = glm::translate(model, glm::vec3(-14.7f, 4.9f, 58.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-14.7f, 4.80f, 58.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.015f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down //y x z
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -667,7 +667,7 @@ bool Update() {
 		model = glm::translate(model, glm::vec3(-0.4f, 5.5f, 34.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(2.0f, 3.0f, 2.0f));	// it's a bit too big for our scene, so scale it down	//y 
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -735,9 +735,10 @@ bool Update() {
 		//mesa1
 		glm::mat4 model = glm::mat4(1.0f);
 		//										z(positivo sentido -z)		y    x(positivo sentido -x)
-		model = glm::translate(model, glm::vec3(13.8f, 4.7f, 56.0f)); // translate it down so it's at the center of the scene
-		//model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
+		model = glm::translate(model, glm::vec3(13.8f, 4.9f, 56.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -807,8 +808,8 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.0f, 5.0f, 58.0f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);//(2.5f, 4.25f, 53.0f));//centro-frente izquierda //6.0f, 5.0f, 58.0f
+		model = glm::translate(model, glm::vec3(2.5f, 5.1f, 53.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(-190.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
@@ -842,10 +843,10 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.0f, 5.0f, 50.0f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-3.5f, 5.15f, 53.8f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
