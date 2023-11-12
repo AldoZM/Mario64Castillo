@@ -1,7 +1,7 @@
 #include "GameObject.h"
-#include <glm/glm.hpp>
+
 #include <glm/gtx/string_cast.hpp>
-#include <model.h>
+
 
 //GameObject::GameObject(Model* model, Shader *shader) {
 //	this->objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -12,10 +12,10 @@ GameObject::GameObject(float x, float y, float z, std::string soundPath = "") {
 	this->soundEffectPath = soundPath;
 }
 
-GameObject::GameObject(glm::vec3 position, std::string soundPath = "", Model* text=NULL) {
+GameObject::GameObject(glm::vec3 position, std::string soundPath = "") {
 	this->objectPosition = position;
 	this->soundEffectPath = soundPath;
-	this->textPath = textPath;
+
 }
 
 glm::vec3 GameObject::getObjectPosition() const {
@@ -43,9 +43,7 @@ const char* GameObject::getSoundPathC() const {
 	return this->soundEffectPath.c_str();
 }
 
-Model* GameObject::gettextPath() const {
-	return this->textPath;
-}
+
 //Model* GameObject::getModel() const {
 //	return this->objectModel;
 //}
