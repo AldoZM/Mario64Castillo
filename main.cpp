@@ -69,7 +69,7 @@ float elapsedTime = 0.0f;
 
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
-glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f);
+glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f); // Cambiar posision en Y
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
 glm::vec3 textInfoOffset(0.0f, 0.0f, 0.0f);
 
@@ -98,6 +98,10 @@ Model* mesa;
 Model* sensor;
 Model* sillon;
 Model* ventana;
+Model* OXXO;
+Model* LittleCessar;
+Model* Cangre;
+
 
 //Modelos carlos
 Model* librero;
@@ -262,12 +266,15 @@ bool Start() {
 	castle = new Model("models/CastilloMaquetado2.fbx");
 	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
-	player = new Model("models/player.fbx");
+	player = new Model("models/Yoshi.fbx");
 	cascada = new Model("models/cascada.fbx");
 	lago1 = new Model("models/AguaRefinado.fbx");
 	valla = new Model("models/CordonMuseo.fbx");
 
 	//Nuevos modelos
+	Cangre = new Model("models/Cangre.fbx");
+	LittleCessar = new Model("models/Little_Ceassar.fbx");
+	OXXO = new Model("models/OXXO.fbx");
 	mesa = new Model("models/mesa.fbx");
 	sensor = new Model("models/sensor.fbx");
 	sillon = new Model("models/sillon.fbx");
@@ -541,7 +548,7 @@ bool Update() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.0005f, 0.0005f, 0.0005f));	// it's a bit too big for our scene, so scale it down
 
 		ourShader->setMat4("model", model);
 
@@ -668,6 +675,35 @@ bool Update() {
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		mesa->Draw(*staticShader);
+		// OXXO
+		model = glm::mat4(1.0f);
+		//										  X  	Z	 Y
+		model = glm::translate(model, glm::vec3(70.0f, 6.5f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(20.35f, 20.35f, 20.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		OXXO->Draw(*staticShader);
+
+		// LittleCessar
+		model = glm::mat4(1.0f);
+		//										  X  	Z	 Y
+		model = glm::translate(model, glm::vec3(-70.0f, 10.3f, 41.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		LittleCessar->Draw(*staticShader);
+		
+		// Krustaseo Kascarudo
+		model = glm::mat4(1.0f);
+		//										  X  	Z	 Y
+		model = glm::translate(model, glm::vec3(-70.0f, 5.0f, 20.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		Cangre->Draw(*staticShader);
 
 	}
 
