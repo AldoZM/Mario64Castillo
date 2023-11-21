@@ -63,9 +63,26 @@ bool firstMouse = true;
 
 // Variables para la velocidad de reproducción
 // de la animación
+////////////// Animacion 1
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
+
+////////////// Animacion 2
+float deltaTime_a2 = 0.0f;
+float lastFrame_a2 = 0.0f;
+float elapsedTime_a2 = 0.0f;
+
+////////////// Animacion 3
+float deltaTime_a3 = 0.0f;
+float lastFrame_a3 = 0.0f;
+float elapsedTime_a3 = 0.0f;
+
+////////////// Animacion 4
+float deltaTime_a4 = 0.0f;
+float lastFrame_a4 = 0.0f;
+float elapsedTime_a4 = 0.0f;
+
 
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
@@ -89,6 +106,8 @@ Shader* waterfallShader;
 Model* castle;
 Model* castleTransparent;
 Model* pillar;
+Model* toad;
+Model* yoshi;
 Model* player;
 Model* cascada;
 Model* lago1;
@@ -150,9 +169,25 @@ glm::mat4 projection; // Variable usada para guardar la matriz de proyecciòn
 glm::mat4 view;  // Variable usada para guardar la matriz de vista(camara)
 glm::mat4 model; // Variable usada para guardar la matriz de las transformaciones del modelo
 
+//////// Animacion 1
 float	fps = 0.0f;
 int		keys = 0;
 int		animationCount = 0;
+
+//////// Animacion 2
+float	fps_a2 = 0.0f;
+int		keys_a2 = 0;
+int		animationCount_a2 = 0;
+
+//////// Animacion 3
+float	fps_a3 = 0.0f;
+int		keys_a3 = 0;
+int		animationCount_a3 = 0;
+
+//////// Animacion 4
+float	fps_a4 = 0.0f;
+int		keys_a4 = 0;
+int		animationCount_a4 = 0;
 
 float elapsedTime2 = 0.0f;
 
@@ -224,7 +259,7 @@ bool Start() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Creación de la ventana con GLFW
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FBX Animation with OpenGL", NULL, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Proyecto museo de videojuegos", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -266,7 +301,9 @@ bool Start() {
 	castle = new Model("models/CastilloMaquetado2.fbx");
 	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
-	player = new Model("models/Yoshi.fbx");
+	yoshi = new Model("models/Yoshi.fbx");
+	toad = new Model("models/Toad.fbx");
+	player = new Model("models/player.fbx");
 	cascada = new Model("models/cascada.fbx");
 	lago1 = new Model("models/AguaRefinado.fbx");
 	valla = new Model("models/CordonMuseo.fbx");
@@ -316,6 +353,21 @@ bool Start() {
 
 	fps = (float)player->getFramerate();
 	keys = (int)player->getNumFrames();
+	////Animacion 2
+	yoshi->SetPose(0.0f, gBones);
+
+	fps_a2 = (float)yoshi->getFramerate();
+	keys_a2 = (int)yoshi->getNumFrames();
+	////Animacion 3
+	toad->SetPose(0.0f, gBones);
+
+	fps_a3 = (float)toad->getFramerate();
+	keys_a3 = (int)toad->getNumFrames();
+	////Animacion 4
+	yoshi->SetPose(0.0f, gBones);
+
+	fps_a4 = (float)yoshi->getFramerate();
+	keys_a4 = (int)yoshi->getNumFrames();
 
 	camera1st.Position = playerPosition; // Posicion de la camara en 1ra persona
 	camera1st.Position += camera1stPersonOffset; // Alto respecto al personaje
@@ -431,6 +483,8 @@ void SetLightUniformVec3(Shader* shader, const char* propertyName, size_t lightI
 
 
 bool Update() {
+
+///// Animacion 1
 	float currentFrame = (float)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
@@ -446,6 +500,57 @@ bool Update() {
 		elapsedTime = 0.0f;
 
 	}
+///// Animacion 2
+	float currentFrame_a2 = (float)glfwGetTime();
+	deltaTime_a2 = currentFrame_a2 - lastFrame_a2;
+	lastFrame_a2 = currentFrame_a2;
+
+	elapsedTime_a2 += deltaTime_a2;
+	if (elapsedTime_a2 > 1.0f / fps_a2) {
+		animationCount_a2++;
+		if (animationCount_a2 > keys_a2 - 1) {
+			animationCount_a2 = 0;
+		}
+		// Configuración de la pose en el instante t
+		yoshi->SetPose((float)animationCount_a2, gBones);
+		elapsedTime_a2 = 0.0f;
+
+	}
+///// Animacion 3
+	float currentFrame_a3 = (float)glfwGetTime();
+	deltaTime_a3 = currentFrame_a3 - lastFrame_a3;
+	lastFrame_a3 = currentFrame_a3;
+
+	elapsedTime_a3 += deltaTime_a3;
+	if (elapsedTime_a3 > 1.0f / fps_a3) {
+		animationCount_a3++;
+		if (animationCount_a3 > keys_a3 - 1) {
+			animationCount_a3 = 0;
+		}
+		// Configuración de la pose en el instante t
+		toad->SetPose((float)animationCount_a3, gBones);
+		elapsedTime_a3 = 0.0f;
+
+	}
+	/*
+///// Animacion 4
+	float currentFrame_a4 = (float)glfwGetTime();
+	deltaTime_a4 = currentFrame_a4 - lastFrame_a4;
+	lastFrame_a4 = currentFrame_a4;
+
+	elapsedTime_a4 += deltaTime_a4;
+	if (elapsedTime_a4 > 1.0f / fps_a4) {
+		animationCount_a4++;
+		if (animationCount_a4 > keys_a4 - 1) {
+			animationCount_a4 = 0;
+		}
+		// Configuración de la pose en el instante t
+		yoshi->SetPose((float)animationCount_a4, gBones);
+		elapsedTime_a4 = 0.0f;
+
+	}
+*/
+
 	// Procesa la entrada del teclado o mouse
 	processInput(window);
 
@@ -548,14 +653,57 @@ bool Update() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.0005f, 0.0005f, 0.0005f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 
 		ourShader->setMat4("model", model);
 
 		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
 
 		// Dibujamos el modelo
-		player->Draw(*ourShader);
+		//player->Draw(*ourShader);
+		
+		////////Animacion 2
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(1.0f, 5.0f, 1.0f)); // translate it down so it's at the center of the scene
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
+
+		// Dibujamos el modelo
+		yoshi->Draw(*ourShader);
+
+		////////Animacion 3
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(7.0f, 5.0f, 1.0f)); // translate it down so it's at the center of the scene
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0001f, 0.0001f, 0.0001f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
+
+		// Dibujamos el modelo
+		toad->Draw(*ourShader);
+/*		
+		////////Animacion 4
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(1.0f, 5.0f, 1.0f)); // translate it down so it's at the center of the scene
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
+
+		// Dibujamos el modelo
+		yoshi->Draw(*ourShader);
+*/
 	}
 
 	mLightsShader->use();
