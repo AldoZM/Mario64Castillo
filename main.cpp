@@ -1,6 +1,8 @@
 /*
 * Laboratorio de Computación Gráfica e Interacción Humano-Computadora
 * 09 - Animación
+*
+* 
 */
 
 #include <iostream>
@@ -63,13 +65,39 @@ bool firstMouse = true;
 
 // Variables para la velocidad de reproducción
 // de la animación
+////////////// Animacion 1
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
+////////////// Animacion 2
+float deltaTime_a2 = 0.0f;
+float lastFrame_a2 = 0.0f;
+float elapsedTime_a2 = 0.0f;
+
+////////////// Animacion 3
+float deltaTime_a3 = 0.0f;
+float lastFrame_a3 = 0.0f;
+float elapsedTime_a3 = 0.0f;
+
+////////////// Animacion 4
+float deltaTime_a4 = 0.0f;
+float lastFrame_a4 = 0.0f;
+float elapsedTime_a4 = 0.0f;
+////////////// Animacion de los Toads //////////////////////////////////////////////
+
+////////////// Animacion bob
+float deltaTime_R1 = 0.0f;
+float lastFrame_R1 = 0.0f;
+float elapsedTime_R1 = 0.0f;
+
+
+
+/*
+*/
 
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
-glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f);
+glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f); // Cambiar posision en Y
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
 glm::vec3 textInfoOffset(0.0f, 0.0f, 0.0f);
 
@@ -89,7 +117,12 @@ Shader* waterfallShader;
 Model* castle;
 Model* castleTransparent;
 Model* pillar;
+Model* toad;
+Model* yoshi;
+Model* yoshiRojo;
+Model* bob;
 Model* player;
+Model* mario;
 Model* cascada;
 Model* lago1;
 Model* valla;
@@ -98,15 +131,20 @@ Model* mesa;
 Model* sensor;
 Model* sillon;
 Model* ventana;
+Model* OXXO;
+Model* LittleCessar;
+Model* Cangre;
 
-//Modelos carlos
+
+
 Model* librero;
 Model* computadora;
 Model* silla;
 Model* root;
 Model* xbox;
+Model* xbox360;
 
-//Modelos aldo
+
 Model* n64;
 Model* ps1;
 Model* wii;
@@ -114,7 +152,7 @@ Model* psp;
 Model* ps2;
 
 
-//Modelos Ernesto
+
 Model* gameBoy;
 Model* snes;
 Model* atari;
@@ -139,17 +177,56 @@ Material plastic;
 std::vector<Light> gLights;
 
 // Pose inicial del modelo
+
+
 glm::mat4 gBones[MAX_RIGGING_BONES];
 glm::mat4 gBonesBar[MAX_RIGGING_BONES];
+
+//Animacion 2
+glm::mat4 gBones_a2[MAX_RIGGING_BONES]; 
+
+//Animacion 3
+glm::mat4 gBones_a3[MAX_RIGGING_BONES]; 
+
+//Animacion 4
+glm::mat4 gBones_a4[MAX_RIGGING_BONES]; 
+
+///////Animacion bob////////////////////////////////////////////////
+
+//Animacion bob
+glm::mat4 gBones_R1[MAX_RIGGING_BONES]; 
 
 glm::mat4 projection; // Variable usada para guardar la matriz de proyecciòn
 glm::mat4 view;  // Variable usada para guardar la matriz de vista(camara)
 glm::mat4 model; // Variable usada para guardar la matriz de las transformaciones del modelo
 
+//////// Animacion 1
 float	fps = 0.0f;
 int		keys = 0;
 int		animationCount = 0;
+//////// Animacion 2
+float	fps_a2 = 0.0f;
+int		keys_a2 = 0;
+int		animationCount_a2 = 0;
 
+//////// Animacion 3
+float	fps_a3 = 0.0f;
+int		keys_a3 = 0;
+int		animationCount_a3 = 0;
+
+//////// Animacion 4
+float	fps_a4 = 0.0f;
+int		keys_a4 = 0;
+int		animationCount_a4 = 0;
+
+///////Animacion de los bob////////////////////////////////////////////////
+
+//////// Animacion bob
+float	fps_R1 = 0.0f;
+int		keys_R1 = 0;
+int		animationCount_R1 = 0;
+/*
+*/
 float elapsedTime2 = 0.0f;
 
 float proceduralTime = 0.0f;
@@ -220,7 +297,7 @@ bool Start() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Creación de la ventana con GLFW
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FBX Animation with OpenGL", NULL, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Proyecto museo de videojuegos", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -262,22 +339,31 @@ bool Start() {
 	castle = new Model("models/CastilloMaquetado2.fbx");
 	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
-	player = new Model("models/player.fbx");
+	yoshi = new Model("models/Yoshi.fbx");
+	yoshiRojo = new Model("models/YoshiRojo.fbx");
+	toad = new Model("models/Toad.fbx");
+	bob = new Model("models/Bob-ombs.fbx");
+	player = new Model("models/Yoshi.fbx");
+	mario = new Model("models/Mario.fbx");
 	cascada = new Model("models/cascada.fbx");
 	lago1 = new Model("models/AguaRefinado.fbx");
 	valla = new Model("models/CordonMuseo.fbx");
 
-	//Nuevos modelos
+
+	Cangre = new Model("models/Cangre.fbx");
+	LittleCessar = new Model("models/Little_Ceassar.fbx");
+	OXXO = new Model("models/OXXO.fbx");
 	mesa = new Model("models/mesa.fbx");
 	sensor = new Model("models/sensor.fbx");
 	sillon = new Model("models/sillon.fbx");
-	//Modelos Carlos
+
 	librero = new Model("models/librero.fbx");
 	computadora = new Model("models/computadora.fbx");
 	silla = new Model("models/silla.fbx");
 	root = new Model("models/rooflamp.fbx");
 	xbox = new Model("models/XboxSerieX.fbx");
-	//Modelos aldo
+	xbox360 = new Model("models/xbox360.fbx");
+
 	n64 = new Model("models/N64.fbx");
 	ps1 = new Model("models/PS1.fbx");
 	wii = new Model("models/Wii.fbx");
@@ -309,7 +395,31 @@ bool Start() {
 
 	fps = (float)player->getFramerate();
 	keys = (int)player->getNumFrames();
+	////Animacion 2
+	yoshi->SetPose(0.0f, gBones_a2);
 
+	fps_a2 = (float)yoshi->getFramerate();
+	keys_a2 = (int)yoshi->getNumFrames();
+	////Animacion 3
+	toad->SetPose(0.0f, gBones_a3);
+
+	fps_a3 = (float)toad->getFramerate();
+	keys_a3 = (int)toad->getNumFrames();
+	////Animacion 4
+	mario->SetPose(0.0f, gBones_a4);
+
+	fps_a4 = (float)mario->getFramerate();
+	keys_a4 = (int)mario->getNumFrames();
+
+	////Animacion bob
+	
+
+	bob->SetPose(0.0f, gBones_a4);
+
+	fps_R1 = (float)bob->getFramerate();
+	keys_R1 = (int)bob->getNumFrames();
+	/*
+	*/
 	camera1st.Position = playerPosition; // Posicion de la camara en 1ra persona
 	camera1st.Position += camera1stPersonOffset; // Alto respecto al personaje
 	camera1st.Front = forwardView;
@@ -363,14 +473,14 @@ bool Start() {
 
 
 	textPaths.push_back("models/textatari.fbx");
-	textPaths.push_back("models/textgameboy.fbx");
-	textPaths.push_back("models/textgamecube.fbx");
-	textPaths.push_back("models/textN64.fbx");
 	textPaths.push_back("models/textnes.fbx");
-	textPaths.push_back("models/textplay1.fbx");
-	textPaths.push_back("models/textps2.fbx");
-	textPaths.push_back("models/textpsp.fbx");
+	textPaths.push_back("models/textXbox360.fbx");
 	textPaths.push_back("models/textsnes.fbx");
+	textPaths.push_back("models/textps2.fbx");
+	textPaths.push_back("models/textN64.fbx");
+	textPaths.push_back("models/textpsp.fbx");
+	textPaths.push_back("models/textgamecube.fbx");
+	textPaths.push_back("models/textplay1.fbx");
 	textPaths.push_back("models/textwii.fbx");
 	textPaths.push_back("models/textxbox.fbx");
 
@@ -424,6 +534,8 @@ void SetLightUniformVec3(Shader* shader, const char* propertyName, size_t lightI
 
 
 bool Update() {
+
+///// Animacion 1
 	float currentFrame = (float)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
@@ -439,6 +551,75 @@ bool Update() {
 		elapsedTime = 0.0f;
 
 	}
+///// Animacion 2
+	float currentFrame_a2 = (float)glfwGetTime();
+	deltaTime_a2 = currentFrame_a2 - lastFrame_a2;
+	lastFrame_a2 = currentFrame_a2;
+
+	elapsedTime_a2 += deltaTime_a2;
+	if (elapsedTime_a2 > 1.0f / fps_a2) {
+		animationCount_a2++;
+		if (animationCount_a2 > keys_a2 - 1) {
+			animationCount_a2 = 0;
+		}
+		// Configuración de la pose en el instante t
+		yoshi->SetPose((float)animationCount_a2, gBones_a2);
+		elapsedTime_a2 = 0.0f;
+
+	}
+///// Animacion 3
+	float currentFrame_a3 = (float)glfwGetTime();
+	deltaTime_a3 = currentFrame_a3 - lastFrame_a3;
+	lastFrame_a3 = currentFrame_a3;
+
+	elapsedTime_a3 += deltaTime_a3;
+	if (elapsedTime_a3 > 1.0f / fps_a3) {
+		animationCount_a3++;
+		if (animationCount_a3 > keys_a3 - 1) {
+			animationCount_a3 = 0;
+		}
+		// Configuración de la pose en el instante t
+		toad->SetPose((float)animationCount_a3, gBones_a3);
+		elapsedTime_a3 = 0.0f;
+
+	}
+/*
+	*/
+///// Animacion 4
+	float currentFrame_a4 = (float)glfwGetTime();
+	deltaTime_a4 = currentFrame_a4 - lastFrame_a4;
+	lastFrame_a4 = currentFrame_a4;
+
+	elapsedTime_a4 += deltaTime_a4;
+	if (elapsedTime_a4 > 1.0f / fps_a4) {
+		animationCount_a4++;
+		if (animationCount_a4 > keys_a4 - 1) {
+			animationCount_a4 = 0;
+		}
+		// Configuración de la pose en el instante t
+		mario->SetPose((float)animationCount_a4, gBones_a4);
+		elapsedTime_a4 = 0.0f;
+
+	}
+///// Animacion bob
+	float currentFrame_R1 = (float)glfwGetTime();
+	deltaTime_R1 = currentFrame_R1 - lastFrame_R1;
+	lastFrame_R1 = currentFrame_R1;
+
+	elapsedTime_R1 += deltaTime_R1;
+	if (elapsedTime_R1 > 1.0f / fps_R1) {
+		animationCount_R1++;
+		if (animationCount_R1 > keys_R1 - 1) {
+			animationCount_R1 = 0;
+		}
+		// Configuración de la pose en el instante t
+		bob->SetPose((float)animationCount_R1, gBones_R1);
+		elapsedTime_R1 = 0.0f;
+
+	}
+	/*
+*/
+
 	// Procesa la entrada del teclado o mouse
 	processInput(window);
 
@@ -541,7 +722,7 @@ bool Update() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.0035f, 0.0035f, 0.0035f));	// it's a bit too big for our scene, so scale it down
 
 		ourShader->setMat4("model", model);
 
@@ -550,6 +731,190 @@ bool Update() {
 		// Dibujamos el modelo
 		player->Draw(*ourShader);
 	}
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	{
+			// Activación del shader del personaje
+		ourShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(59.0f, -1.0f, -9.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a2);
+
+		// Dibujamos el modelo
+		yoshi->Draw(*ourShader);
+	}
+
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	{
+			// Activación del shader del personaje
+		ourShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 3.7f, 29.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a3);
+
+		// Dibujamos el modelo
+		toad->Draw(*ourShader);
+	}
+	
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	
+	{
+			// Activación del shader del personaje
+		ourShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-9.0f, 3.7f, 45.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a3);
+
+		// Dibujamos el modelo
+		toad->Draw(*ourShader);
+	}
+	
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	
+	{
+			// Activación del shader del personaje
+		ourShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(13.0f, 3.7f, 47.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a3);
+
+		// Dibujamos el modelo
+		toad->Draw(*ourShader);
+	}
+	
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	
+	
+
+	
+	{
+			// Activación del shader del personaje
+		ourShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-6.5f, 3.5f, 56.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(220.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00012f, 0.00012f, 0.00012f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a4);
+
+		// Dibujamos el modelo
+		mario->Draw(*ourShader);
+	}
+	
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	
+	{
+			// Activación del shader del personaje
+		ourShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.0f, 4.0f, 56.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0005f, 0.0005f, 0.0005f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_R1);
+
+		// Dibujamos el modelo
+		bob->Draw(*ourShader);
+	}
+	
+		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
+	
 
 	mLightsShader->use();
 
@@ -668,6 +1033,35 @@ bool Update() {
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		mesa->Draw(*staticShader);
+		// OXXO
+		model = glm::mat4(1.0f);
+		//										  X  	Z	 Y
+		model = glm::translate(model, glm::vec3(70.0f, 6.5f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(20.35f, 20.35f, 20.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		OXXO->Draw(*staticShader);
+
+		// LittleCessar
+		model = glm::mat4(1.0f);
+		//										  X  	Z	 Y
+		model = glm::translate(model, glm::vec3(-70.0f, 10.3f, 41.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		LittleCessar->Draw(*staticShader);
+		
+		// Krustaseo Kascarudo
+		model = glm::mat4(1.0f);
+		//										  X  	Z	 Y
+		model = glm::translate(model, glm::vec3(-70.0f, 5.0f, 20.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		Cangre->Draw(*staticShader);
 
 	}
 
@@ -950,10 +1344,11 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);//(2.5f, 4.25f, 53.0f));//centro-frente izquierda //6.0f, 5.0f, 58.0f
-		model = glm::translate(model, glm::vec3(2.5f, 5.1f, 53.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-190.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		model = glm::translate(model, glm::vec3(2.5f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		// model = glm::rotate(model, glm::radians(-190.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 0.2f, 0.1f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
 
 		mLightsShader->setInt("numLights", (int)gLights.size());
@@ -973,7 +1368,7 @@ bool Update() {
 		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
 		mLightsShader->setFloat("transparency", material.transparency);
 
-		gameBoy->Draw(*mLightsShader);
+		xbox360->Draw(*mLightsShader);
 	}
 
 	{
@@ -1350,7 +1745,7 @@ bool Update() {
 	}
 
 
-	glUseProgram(0);
+	glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

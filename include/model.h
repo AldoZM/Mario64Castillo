@@ -141,6 +141,8 @@ public:
 		}
 	}
 
+
+
 	// Return the duration of the animation in ticks (frames)
 	double getNumFrames() {
 
