@@ -4,3 +4,4 @@ bin/*.exe
 bin/*.pdb
 museo
 teoria
+.vs
