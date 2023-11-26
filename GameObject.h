@@ -7,8 +7,10 @@
 class GameObject {
 public:
 
-	GameObject(float x, float y, float z, std::string soundPath, glm::vec3 angles);
-	GameObject(glm::vec3 position, std::string soundPath);
+	GameObject(float x, float y, float z, 
+			std::string soundPath="", 
+			glm::vec3 angles = glm::vec3(0.0f, -90.0f, 0.0f));
+	GameObject(glm::vec3 position, std::string soundPath="");
 	//GameObject(Model* model, Shader* shader);
 	glm::vec3 getObjectPosition() const;
 	std::string getSoundPath() const;
@@ -18,6 +20,7 @@ public:
 	void rotateObjectZ(float angleToAdd);
 	float getAngleZ() const;
 	std::string toString() const;
+	void setObjectPosition(glm::vec3 newPosition);
 	//Model *getModel() const;
 	//Shader* getShader() const;
 	//void renderObject(glm::mat4 view, glm::mat4  projection);

@@ -36,6 +36,8 @@ using namespace irrklang;
 #define MAX_RIGGING_BONES 100
 #define MAX_PILLARS 10
 
+#define MAX_CONSOLES 11
+
 // Functions
 bool Start();
 bool Update();
@@ -90,18 +92,13 @@ float deltaTime_R1 = 0.0f;
 float lastFrame_R1 = 0.0f;
 float elapsedTime_R1 = 0.0f;
 
-
-
-/*
-*/
-
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
 glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f); // Cambiar posision en Y
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
-glm::vec3 textInfoOffset(0.0f, 0.0f, 0.0f);
+glm::vec3 textInfoOffset(0.0f, 0.0f, 0.81f);
 
-float     scaleV = 0.5f;
+float     scaleV = 0.1f;
 float     scaleH = 0.005f;
 float     rotateCharacter = 0.0f;
 
@@ -144,14 +141,11 @@ Model* root;
 Model* xbox;
 Model* xbox360;
 
-
 Model* n64;
 Model* ps1;
 Model* wii;
 Model* psp;
 Model* ps2;
-
-
 
 Model* gameBoy;
 Model* snes;
@@ -161,9 +155,13 @@ Model* nes;
 
 
 Model* textInfo[11];
-GameObject* gameObjectsPillars[10];
+GameObject* gameObjectsPillars[MAX_PILLARS];
 GameObject* moveObject;
+GameObject* atariGameObject;
+GameObject* consoles[MAX_CONSOLES];
 
+
+enum INDEX_CONSOLE {ATARI, NES, SNES, PS1, N64, PS2, GAMECUBE, PSP, XBOX360, WII, XBOXSX};
 // Cubemap
 CubeMap* mainCubeMap;
 
@@ -250,8 +248,12 @@ int minimalDistanceTransforms = 8;
 
 bool disableSounds = false;
 bool disableText = false;
+bool pressE = false;
 
+std::vector <glm::vec3> consoleFinalPositions; // Arreglo para la posición final de las consolas
+std::vector <bool> boolFinalPositions;
 
+int selectedConsole;
 
 // Entrada a función principal
 int main()
@@ -290,6 +292,9 @@ bool Start() {
 	std::vector<glm::vec3> pillarsPositions; // Arreglo para guardar las posiciones de los pilares
 	std::vector <std::string> soundEffectsPaths; // Arreglo para guardar las direcciones de los efectos de sonido
 	std::vector <std::string > textPaths;
+	std::vector <glm::vec3> consolePositions; // Arreglo para guardar las posiciones de las consolas
+	
+
 	// Inicialización de GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -484,7 +489,28 @@ bool Start() {
 	textPaths.push_back("models/textwii.fbx");
 	textPaths.push_back("models/textxbox.fbx");
 
+	consolePositions.push_back(glm::vec3(5.5f, 4.25f, 50.0f)); // posición atari
+	consolePositions.push_back(glm::vec3(-5.0f, 4.25f, 40.0f));//centro-atras derecha
+	consolePositions.push_back(glm::vec3(2.5f, 4.25f, 53.0f));//centro-frente izquierda
+	consolePositions.push_back(glm::vec3(-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+	consolePositions.push_back(glm::vec3(10.1f, 4.25f, 61.5f));//izwuierda enfrente
+	consolePositions.push_back(glm::vec3(-11.0f, 4.25f, 61.2f));//enfrente,x negativa
+	consolePositions.push_back(glm::vec3(12.5f, 4.25f, 53.5f));//izquierda atras
+	consolePositions.push_back(glm::vec3(-14.5f, 4.25f, 54.0f));//atras, xnegativo
+	consolePositions.push_back(glm::vec3(8.0f, 9.25f, 64.0f));
+	consolePositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
+	consolePositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
+
+	consoleFinalPositions.push_back(glm::vec3(4.0f, 4.9f, 41.0f)); // Posicion final de Atari
+	//consoleFinalPositions.push_back();
+
+	for (size_t i = 0; i < MAX_CONSOLES; i++)
+	{
+		boolFinalPositions.push_back(false);
+	}
+	
 	glm::vec3 position;
+	glm::vec3 consolePosition;
 	std::string soundEffectPath;
 	
 	for (size_t i = 0; i < MAX_PILLARS; i++)
@@ -494,11 +520,20 @@ bool Start() {
 		textInfo[i] = new Model(textPaths.at(i));
 		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
 	}
+
+	for (size_t i = 0; i < MAX_CONSOLES; i++) // Ciclo para iniciar las posiciones de las consolas
+	{
+		consolePosition = consolePositions.at(i);
+		consoles[i] = new GameObject(consolePosition);
+	}
 	// RGBa (Red, Green, Blue and Alpha)
 	SoundEngine->play2D("audio/gta.mp3");
-	SoundEngine->play2D("audio/KonosubaAudio.mp3");
+	// SoundEngine->play2D("audio/KonosubaAudio.mp3");
 
 	minimalDistanceAudio = 5;
+
+	// atariGameObject = new GameObject(position);
+	
 	return true;
 }
 
@@ -542,6 +577,7 @@ bool Update() {
 	lastFrame = currentFrame;
 
 	elapsedTime += deltaTime;
+	elapsedTime2 += deltaTime;
 	if (elapsedTime > 1.0f / fps) {
 		animationCount++;
 		if (animationCount > keys - 1) {
@@ -591,6 +627,8 @@ bool Update() {
 	deltaTime_a4 = currentFrame_a4 - lastFrame_a4;
 	lastFrame_a4 = currentFrame_a4;
 
+	elapsedTime2 += deltaTime; // Tiempo para la tecla de consolas
+
 	elapsedTime_a4 += deltaTime_a4;
 	if (elapsedTime_a4 > 1.0f / fps_a4) {
 		animationCount_a4++;
@@ -607,6 +645,7 @@ bool Update() {
 	deltaTime_R1 = currentFrame_R1 - lastFrame_R1;
 	lastFrame_R1 = currentFrame_R1;
 
+
 	elapsedTime_R1 += deltaTime_R1;
 	if (elapsedTime_R1 > 1.0f / fps_R1) {
 		animationCount_R1++;
@@ -620,6 +659,7 @@ bool Update() {
 	}
 	/*
 */
+	
 
 	// Procesa la entrada del teclado o mouse
 	processInput(window);
@@ -752,7 +792,7 @@ bool Update() {
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
 
 		ourShader->setMat4("model", model);
 
@@ -1447,10 +1487,23 @@ bool Update() {
 		mLightsShader->setMat4("projection", projection);
 		mLightsShader->setMat4("view", view);
 
+		if (pressE && !boolFinalPositions.at(ATARI) && selectedConsole == ATARI) {
+			consoles[ATARI]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
 		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(4.0f, 4.9f, 41.0f)); // translate it down so it's at the center of the scene
+		glm::vec3 objectPosition = consoles[ATARI]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(ATARI) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(ATARI)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(ATARI) = true;
+		}	
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+			
+		
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.03f, 0.04f, 0.04f));	// it's a bit too big for our scene, so scale it down//x y z
 		mLightsShader->setMat4("model", model);
@@ -1760,6 +1813,25 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		selectedConsole = -1;
+		if (elapsedTime2 > 0.2f) {
+			pressE = !pressE;
+			elapsedTime2 = 0.0f;
+		}
+
+		if (pressE) {
+			for (size_t i = 0; i < MAX_CONSOLES; i++)
+			{
+				glm::vec3 objectPosition = consoles[i]->getObjectPosition();
+				auto distance = glm::length(playerPosition - objectPosition);
+				if (distance <= 1.5f) {
+					selectedConsole = i;
+					break;
+				}
+			}
+		}
+	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		camera3rd.ProcessKeyboard(FORWARD, deltaTime);
@@ -1839,9 +1911,9 @@ void processInput(GLFWwindow* window)
 
 	// Character movement
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		
 		playerPosition = playerPosition + scaleV * forwardView;
 		camera1st.Front = forwardView;
-		camera1st.ProcessKeyboard(FORWARD, deltaTime);
 		camera1st.Position = playerPosition;
 		camera1st.Position += camera1stPersonOffset;
 	}
@@ -1849,7 +1921,6 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		playerPosition = playerPosition - scaleV * forwardView;
 		camera1st.Front = forwardView;
-		camera1st.ProcessKeyboard(BACKWARD, deltaTime);
 		camera1st.Position = playerPosition;
 		camera1st.Position += camera1stPersonOffset;
 	}
@@ -1898,11 +1969,16 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
-		
-		elapsedTime2 += deltaTime;
 		if (elapsedTime2 > 0.5f) {
 			SoundEngine->stopAllSounds();
 			disableSounds = !disableSounds;
+			elapsedTime2 = 0.0f;
+		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) {
+		if (elapsedTime2 > 0.5f) {
+			disableText = !disableText;
 			elapsedTime2 = 0.0f;
 		}
 	}
@@ -1925,6 +2001,20 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
 		gLights[0].Direction.y -= 0.01f;
 		std::cout << glm::to_string(gLights[0].Direction) << std::endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
+		scaleV -= 0.001f;
+		if (scaleV <= 0) {
+			scaleV = 0.1f;
+		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
+		scaleV += 0.001f;
+		if (scaleV >= 0.2f) {
+			scaleV = 0.1f;
+		}
 	}
 }
 

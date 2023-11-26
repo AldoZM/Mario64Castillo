@@ -8,14 +8,14 @@
 //}
 
 GameObject::GameObject(float x, float y, float z, 
-					std::string soundPath = "", 
-					glm::vec3 angles = glm::vec3(0.0f, -90.0f, 0.0f)) {
+					std::string soundPath, 
+					glm::vec3 angles) {
 	this->objectPosition = glm::vec3(x, y, z);
 	this->soundEffectPath = soundPath;
 	this->objectAngles = angles;
 }
 
-GameObject::GameObject(glm::vec3 position, std::string soundPath = "") {
+GameObject::GameObject(glm::vec3 position, std::string soundPath) {
 	this->objectPosition = position;
 	this->soundEffectPath = soundPath;
 	this->objectAngles = glm::vec3(0.0f, -90.0f, 0.0f);
@@ -32,6 +32,10 @@ void GameObject::moveObjectPosition(float escalar) {
 void GameObject::moveObjectPosition(float x, float y, float z) {
 	glm::vec3 vectorToAdd = glm::vec3(x, y, z);
 	this->objectPosition += vectorToAdd;
+}
+
+void GameObject::setObjectPosition(glm::vec3 newPosition) {
+	this->objectPosition = newPosition;
 }
 
 

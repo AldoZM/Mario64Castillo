@@ -3,3 +3,4 @@ Project
 bin/*.exe
 bin/*.pdb
 museo
+.vs
