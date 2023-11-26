@@ -436,9 +436,9 @@ bool Start() {
 	// Lights configuration
 
 	Light light;
-	light.Position = glm::vec3(4.0f, 20.0f, 53.0f);
+	light.Position = glm::vec3(4.0f, 20.0f, 45.0f);
 	light.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	light.Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	light.Color = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
 
 	gLights.push_back(light);
 
@@ -502,6 +502,16 @@ bool Start() {
 	consolePositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
 
 	consoleFinalPositions.push_back(glm::vec3(4.0f, 4.9f, 41.0f)); // Posicion final de Atari
+	consoleFinalPositions.push_back(glm::vec3(-5.0f, 5.3f, 40.0f)); // Posicion final de NES
+	consoleFinalPositions.push_back(glm::vec3(-3.5f, 5.15f, 53.8f)); // Posicion final de SNES
+	consoleFinalPositions.push_back(glm::vec3(-14.7f, 4.80f, 58.0f)); // Posicion final de PS1
+	consoleFinalPositions.push_back(glm::vec3(-8.0f, 5.0f, 59.0f)); // Posicion final de n64
+	consoleFinalPositions.push_back(glm::vec3(10.0, 5.0f, 61.3f)); // Posicion final de PS2
+	consoleFinalPositions.push_back(glm::vec3(-14.5f, 4.85f, 54.0f)); // Posicion final de GAMECUBE
+	consoleFinalPositions.push_back(glm::vec3(12.5f, 5.2f, 53.5f)); // Posicion final de PSP
+	consoleFinalPositions.push_back(glm::vec3(2.5f, 5.5f, 53.0f)); // Posicion final de XBOX360
+	consoleFinalPositions.push_back(glm::vec3(-11.0f, 5.0f, 60.8f)); // Posicion final de WII
+	consoleFinalPositions.push_back(glm::vec3(13.8f, 4.9f, 56.0f));  // Posicion final de XBOXSX
 	//consoleFinalPositions.push_back();
 
 	for (size_t i = 0; i < MAX_CONSOLES; i++)
@@ -993,6 +1003,10 @@ bool Update() {
 			if (distance < minimalDistanceAudio && !disableText) {
 				model = glm::mat4(1.0f);
 				
+
+
+				//model = glm::translate(model, camera1st.Position); // translate it down so it's at the center of the scene
+				//model = glm::rotate(model, glm::radians(rotateCharacter), camera1st.Front);
 				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.81f)); // translate it down so it's at the center of the scene
 				//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
 				model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -1132,8 +1146,25 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);			//z(positivo en +z)   y   x(positivo en -x)
-		model = glm::translate(model, glm::vec3(-14.7f, 4.80f, 58.0f)); // translate it down so it's at the center of the scene
+		if (pressE && !boolFinalPositions.at(PS1) && selectedConsole == PS1) {
+			consoles[PS1]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[PS1]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(PS1) - objectPosition);
+		if (distance <= 5.0f) {
+			model = glm::translate(model, consoleFinalPositions.at(PS1)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(PS1) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
+
+		
+		
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.015f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down //y x z
@@ -1237,9 +1268,22 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		//mesa1
-		glm::mat4 model = glm::mat4(1.0f);
-		//										z(positivo sentido -z)		y    x(positivo sentido -x)
-		model = glm::translate(model, glm::vec3(13.8f, 4.9f, 56.0f)); // translate it down so it's at the center of the scene
+		if (pressE && !boolFinalPositions.at(XBOXSX) && selectedConsole == XBOXSX) {
+			consoles[XBOXSX]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
+		//mesa1
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[XBOXSX]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(XBOXSX) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(XBOXSX)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(XBOXSX) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
@@ -1274,9 +1318,23 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(N64) && selectedConsole == N64) {
+			consoles[N64]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-8.0f, 5.0f, 59.0f)); // translate it down so it's at the center of the scene
+		glm::vec3 objectPosition = consoles[N64]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(N64) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(N64)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(N64) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
+		
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
@@ -1383,9 +1441,24 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(XBOX360) && selectedConsole == XBOX360) {
+			consoles[XBOX360]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);//(2.5f, 4.25f, 53.0f));//centro-frente izquierda //6.0f, 5.0f, 58.0f
-		model = glm::translate(model, glm::vec3(2.5f, 5.5f, 53.0f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[XBOX360]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(XBOX360) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(XBOX360)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(XBOX360) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
+		
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		// model = glm::rotate(model, glm::radians(-190.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -1419,9 +1492,22 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(SNES) && selectedConsole == SNES) {
+			consoles[SNES]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-		model = glm::translate(model, glm::vec3(-3.5f, 5.15f, 53.8f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[SNES]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(SNES) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(SNES)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(SNES) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
@@ -1453,9 +1539,22 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(GAMECUBE) && selectedConsole == GAMECUBE) {
+			consoles[GAMECUBE]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);//(-14.5f, 4.25f, 54.0f)
-		model = glm::translate(model, glm::vec3(-14.5f, 4.85f, 54.0f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[GAMECUBE]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(GAMECUBE) - objectPosition);
+		if (distance <= 2.0f) {
+			model = glm::translate(model, consoleFinalPositions.at(GAMECUBE)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(GAMECUBE) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
@@ -1536,9 +1635,23 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(NES) && selectedConsole == NES) {
+			consoles[NES]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);//(-5.0f, 4.25f, 40.0f)
-		model = glm::translate(model, glm::vec3(-5.0f, 5.3f, 40.0f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[NES]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(NES) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(NES)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(NES) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
+
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
@@ -1570,9 +1683,22 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(WII) && selectedConsole == WII) {
+			consoles[WII]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f); //x y z
-		model = glm::translate(model, glm::vec3(-11.0f, 5.0f, 60.8f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[WII]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(WII) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(WII)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(WII) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.18f, 0.18f, 0.18f));	// it's a bit too big for our scene, so scale it down
@@ -1605,9 +1731,22 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(PSP) && selectedConsole == PSP) {
+			consoles[PSP]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f);			//z (positivo )				//x(positivo -z)
-		model = glm::translate(model, glm::vec3(12.5f, 5.2f, 53.5f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[PSP]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(PSP) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(PSP)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(PSP) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
@@ -1639,9 +1778,23 @@ bool Update() {
 		mLightsShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
+		if (pressE && !boolFinalPositions.at(PS2) && selectedConsole == PS2) {
+			consoles[PS2]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		// Aplicamos transformaciones del modelo
 		//mesa1
-		model = glm::mat4(1.0f); //z(positivo -z) y x
-		model = glm::translate(model, glm::vec3(10.0, 5.0f, 61.3f)); // translate it down so it's at the center of the scene
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[PS2]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(PS2) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(PS2)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(PS2) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+
+
 		model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.15f, 0.15f, 0.15f));	// it's a bit too big for our scene, so scale it down
 		mLightsShader->setMat4("model", model);
