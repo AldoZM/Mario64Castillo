@@ -479,13 +479,13 @@ bool Start() {
 
 	textPaths.push_back("models/textatari.fbx");
 	textPaths.push_back("models/textnes.fbx");
-	textPaths.push_back("models/textXbox360.fbx");
 	textPaths.push_back("models/textsnes.fbx");
-	textPaths.push_back("models/textps2.fbx");
-	textPaths.push_back("models/textN64.fbx");
-	textPaths.push_back("models/textpsp.fbx");
-	textPaths.push_back("models/textgamecube.fbx");
 	textPaths.push_back("models/textplay1.fbx");
+	textPaths.push_back("models/textN64.fbx");
+	textPaths.push_back("models/textps2.fbx");
+	textPaths.push_back("models/textgamecube.fbx");
+	textPaths.push_back("models/textpsp.fbx");
+	textPaths.push_back("models/textXbox360.fbx");
 	textPaths.push_back("models/textwii.fbx");
 	textPaths.push_back("models/textxbox.fbx");
 
@@ -527,7 +527,7 @@ bool Start() {
 	{
 		position = pillarsPositions.at(i);
 		soundEffectPath = soundEffectsPaths.at(i);
-		textInfo[i] = new Model(textPaths.at(i));
+		
 		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
 	}
 
@@ -535,6 +535,7 @@ bool Start() {
 	{
 		consolePosition = consolePositions.at(i);
 		consoles[i] = new GameObject(consolePosition);
+		textInfo[i] = new Model(textPaths.at(i));
 	}
 	// RGBa (Red, Green, Blue and Alpha)
 	SoundEngine->play2D("audio/gta.mp3");
@@ -999,7 +1000,7 @@ bool Update() {
 				moveObject = gameObjectsPillars[i];
 				objectPosition = gameObjectsPillars[i]->getObjectPosition();
 			}
-			
+			/*
 			if (distance < minimalDistanceAudio && !disableText) {
 				model = glm::mat4(1.0f);
 				
@@ -1017,7 +1018,7 @@ bool Update() {
 				textInfo[i]->Draw(*staticShader);
 			}
 
-			
+			*/
 
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
@@ -1046,6 +1047,48 @@ bool Update() {
 			pillar->Draw(*mLightsShader);
 		}
 	}
+
+	staticShader->use();
+
+	{
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		for (size_t i = 0; i < MAX_CONSOLES; i++)
+		{
+			ourShader->setMat4("view", view);
+			ourShader->setMat4("projection", projection);
+
+			glm::vec3 objectPosition = consoleFinalPositions[i];
+			
+			auto distance = glm::length(playerPosition - objectPosition);
+
+			if (distance < minimalDistanceAudio && !disableText) {
+				model = glm::mat4(1.0f);
+
+
+
+				//model = glm::translate(model, camera1st.Position); // translate it down so it's at the center of the scene
+				//model = glm::rotate(model, glm::radians(rotateCharacter), camera1st.Front);
+				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.81f)); // translate it down so it's at the center of the scene
+				//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
+				model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+				model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+				staticShader->setMat4("model", model);
+				textInfo[i]->Draw(*staticShader);
+			}
+		}
+		// Activación del shader del personaje
+		
+
+		
+
+	}
+
+	
 
 	staticShader->use();
 	{
