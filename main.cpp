@@ -109,6 +109,7 @@ Shader* mLightsShader;
 Shader* staticShader;
 Shader* wavesShader;
 Shader* waterfallShader;
+Shader* proceduralShader;
 
 // Carga la información del modelo
 Model* castle;
@@ -152,7 +153,10 @@ Model* snes;
 Model* atari;
 Model* gameCube;
 Model* nes;
-
+Model* moon;
+Model* sun;
+Model* sign;
+Model* bienvenida;
 
 Model* textInfo[11];
 GameObject* gameObjectsPillars[MAX_PILLARS];
@@ -334,6 +338,7 @@ bool Start() {
 	mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs"); // Shader para multiples fuentes de iluminaciòn
 	wavesShader = new Shader("shaders/wavesAnimation.vs", "shaders/wavesAnimation.fs"); // Shader para la el agua
 	waterfallShader = new Shader("shaders/waterfallAnimation.vs", "shaders/waterfallAnimation.fs"); // Shader para la cascada
+	proceduralShader = new Shader("shaders/12_ProceduralAnimation.vs", "shaders/12_ProceduralAnimation.fs");//Shader de la luna
 
 	// Máximo número de huesos: 100
 	ourShader->setBonesIDs(MAX_RIGGING_BONES);
@@ -353,7 +358,7 @@ bool Start() {
 	cascada = new Model("models/cascada.fbx");
 	lago1 = new Model("models/AguaRefinado.fbx");
 	valla = new Model("models/CordonMuseo.fbx");
-
+	sign = new Model("models/flecha.fbx");
 
 	Cangre = new Model("models/Cangre.fbx");
 	LittleCessar = new Model("models/Little_Ceassar.fbx");
@@ -380,7 +385,9 @@ bool Start() {
 	atari = new Model("models/Atari.fbx");
 	gameCube = new Model("models/Gamecube.fbx");
 	nes = new Model("models/NES.fbx");
-
+	moon = new Model("models/moon.fbx");
+	sun = new Model("models/Sol.fbx");
+	bienvenida = new Model("models/bienvenida.fbx");
 
 	// Cubemap
 	vector<std::string> faces
@@ -1162,6 +1169,168 @@ bool Update() {
 		Cangre->Draw(*staticShader);
 
 	}
+	glUseProgram(0);
+
+	// Actividad 5.2
+
+	{
+		// Activamos el shader de Phong
+		proceduralShader->use();
+
+		// Activamos para objetos transparentes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		//glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+		//glm::mat4 view = camera.GetViewMatrix();
+		proceduralShader->setMat4("projection", projection);
+		proceduralShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -55.0f));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(50.0f, 50.0f, 50.0f));
+		proceduralShader->setMat4("model", model);
+
+		proceduralShader->setFloat("time", proceduralTime);
+		proceduralShader->setFloat("radius", 50.0f);
+		proceduralShader->setFloat("height", 40.0f);
+
+		moon->Draw(*proceduralShader);
+
+
+		proceduralShader->setMat4("projection", projection);
+		proceduralShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -55.0f));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(50.0f, 50.0f, 50.0f));
+		proceduralShader->setMat4("model", model);
+
+		proceduralShader->setFloat("time", proceduralTime-3.14159);
+		proceduralShader->setFloat("radius", 50.0f);
+		proceduralShader->setFloat("height", 40.0f);
+
+		sun->Draw(*proceduralShader);
+
+		proceduralTime += 0.001;
+
+	}
+
+	glUseProgram(0);
+
+
+	staticShader->use();
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa2
+
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 6.5f, 0.0f)); // translate it down so it's at the center of the scene
+		//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		bienvenida->Draw(*staticShader);
+	}
+
+
+	staticShader->use();
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa2
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(3.2f, 3.5f, -15.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+	}
+
+	glUseProgram(0);
+
+	staticShader->use();
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa2
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+	}
+
+	glUseProgram(0);
+
+
+	staticShader->use();
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa2
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+	}
+
+	glUseProgram(0);
+
+
+
+
+	staticShader->use();
+	{
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		staticShader->setMat4("projection", projection);
+		staticShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		//mesa2
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.3f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+	}
+
+	glUseProgram(0);
+
 
 	staticShader->use();
 	{
