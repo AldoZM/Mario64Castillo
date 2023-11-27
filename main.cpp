@@ -489,17 +489,17 @@ bool Start() {
 	textPaths.push_back("models/textwii.fbx");
 	textPaths.push_back("models/textxbox.fbx");
 
-	consolePositions.push_back(glm::vec3(5.5f, 4.25f, 50.0f)); // posición atari
-	consolePositions.push_back(glm::vec3(-5.0f, 4.25f, 40.0f));//centro-atras derecha
-	consolePositions.push_back(glm::vec3(2.5f, 4.25f, 53.0f));//centro-frente izquierda
-	consolePositions.push_back(glm::vec3(-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-	consolePositions.push_back(glm::vec3(10.1f, 4.25f, 61.5f));//izwuierda enfrente
-	consolePositions.push_back(glm::vec3(-11.0f, 4.25f, 61.2f));//enfrente,x negativa
-	consolePositions.push_back(glm::vec3(12.5f, 4.25f, 53.5f));//izquierda atras
-	consolePositions.push_back(glm::vec3(-14.5f, 4.25f, 54.0f));//atras, xnegativo
-	consolePositions.push_back(glm::vec3(8.0f, 9.25f, 64.0f));
-	consolePositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
-	consolePositions.push_back(glm::vec3(-5.0f, 9.25f, 61.0f));
+	consolePositions.push_back(glm::vec3(2.0f, 4.9f, 44.5f)); // posición atari
+	consolePositions.push_back(glm::vec3(-1.0f, 5.3f, 43.0f));//centro-atras derecha
+	consolePositions.push_back(glm::vec3(1.5f, 5.15f, 41.8f));//centro-frente izquierda
+	consolePositions.push_back(glm::vec3(-1.2f, 4.80f, 45.0f));//centro-frente, derecha
+	consolePositions.push_back(glm::vec3(-2.0f, 5.0f, 47.0f));//izwuierda enfrente
+	consolePositions.push_back(glm::vec3(0.8, 5.0f, 43.3f));//enfrente,x negativa
+	consolePositions.push_back(glm::vec3(-2.5f, 4.85f, 45.0f));//izquierda atras
+	consolePositions.push_back(glm::vec3(-0.5f, 5.2f, 45.5f));//atras, xnegativo
+	consolePositions.push_back(glm::vec3(0.2f, 4.9f, 45.0f));
+	consolePositions.push_back(glm::vec3(2.0f, 5.0f, 47.0f));
+	consolePositions.push_back(glm::vec3(0.2f, 4.9f, 45.0f));
 
 	consoleFinalPositions.push_back(glm::vec3(4.0f, 4.9f, 41.0f)); // Posicion final de Atari
 	consoleFinalPositions.push_back(glm::vec3(-5.0f, 5.3f, 40.0f)); // Posicion final de NES
