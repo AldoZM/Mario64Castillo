@@ -35,7 +35,6 @@ using namespace irrklang;
 // Max number of bones
 #define MAX_RIGGING_BONES 100
 #define MAX_PILLARS 10
-
 #define MAX_CONSOLES 11
 
 // Functions
@@ -59,7 +58,6 @@ Camera camera1st(glm::vec3(0.0f, 0.0f, 0.0f));
 Camera camera3rd(glm::vec3(0.0f, 0.0f, 0.0f));
 Camera* activeCamera;
 
-
 // Controladores para el movimiento del mouse
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -71,26 +69,6 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float elapsedTime = 0.0f;
-////////////// Animacion 2
-float deltaTime_a2 = 0.0f;
-float lastFrame_a2 = 0.0f;
-float elapsedTime_a2 = 0.0f;
-
-////////////// Animacion 3
-float deltaTime_a3 = 0.0f;
-float lastFrame_a3 = 0.0f;
-float elapsedTime_a3 = 0.0f;
-
-////////////// Animacion 4
-float deltaTime_a4 = 0.0f;
-float lastFrame_a4 = 0.0f;
-float elapsedTime_a4 = 0.0f;
-////////////// Animacion de los Toads //////////////////////////////////////////////
-
-////////////// Animacion bob
-float deltaTime_R1 = 0.0f;
-float lastFrame_R1 = 0.0f;
-float elapsedTime_R1 = 0.0f;
 
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
@@ -99,7 +77,6 @@ glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
 glm::vec3 textInfoOffset(0.0f, 0.0f, 0.81f);
 
 float     scaleV = 0.1f;
-float     scaleH = 0.005f;
 float     rotateCharacter = 0.0f;
 
 // Shaders
@@ -115,12 +92,7 @@ Shader* proceduralShader;
 Model* castle;
 Model* castleTransparent;
 Model* pillar;
-Model* toad;
-Model* yoshi;
-Model* yoshiRojo;
-Model* bob;
 Model* player;
-Model* mario;
 Model* cascada;
 Model* lago1;
 Model* valla;
@@ -129,11 +101,6 @@ Model* mesa;
 Model* sensor;
 Model* sillon;
 Model* ventana;
-Model* OXXO;
-Model* LittleCessar;
-Model* Cangre;
-
-
 
 Model* librero;
 Model* computadora;
@@ -164,7 +131,6 @@ GameObject* moveObject;
 GameObject* atariGameObject;
 GameObject* consoles[MAX_CONSOLES];
 
-
 enum INDEX_CONSOLE {ATARI, NES, SNES, PS1, N64, PS2, GAMECUBE, PSP, XBOX360, WII, XBOXSX};
 // Cubemap
 CubeMap* mainCubeMap;
@@ -184,20 +150,6 @@ std::vector<Light> gLights;
 glm::mat4 gBones[MAX_RIGGING_BONES];
 glm::mat4 gBonesBar[MAX_RIGGING_BONES];
 
-//Animacion 2
-glm::mat4 gBones_a2[MAX_RIGGING_BONES]; 
-
-//Animacion 3
-glm::mat4 gBones_a3[MAX_RIGGING_BONES]; 
-
-//Animacion 4
-glm::mat4 gBones_a4[MAX_RIGGING_BONES]; 
-
-///////Animacion bob////////////////////////////////////////////////
-
-//Animacion bob
-glm::mat4 gBones_R1[MAX_RIGGING_BONES]; 
-
 glm::mat4 projection; // Variable usada para guardar la matriz de proyecciòn
 glm::mat4 view;  // Variable usada para guardar la matriz de vista(camara)
 glm::mat4 model; // Variable usada para guardar la matriz de las transformaciones del modelo
@@ -206,29 +158,7 @@ glm::mat4 model; // Variable usada para guardar la matriz de las transformacione
 float	fps = 0.0f;
 int		keys = 0;
 int		animationCount = 0;
-//////// Animacion 2
-float	fps_a2 = 0.0f;
-int		keys_a2 = 0;
-int		animationCount_a2 = 0;
 
-//////// Animacion 3
-float	fps_a3 = 0.0f;
-int		keys_a3 = 0;
-int		animationCount_a3 = 0;
-
-//////// Animacion 4
-float	fps_a4 = 0.0f;
-int		keys_a4 = 0;
-int		animationCount_a4 = 0;
-
-///////Animacion de los bob////////////////////////////////////////////////
-
-//////// Animacion bob
-float	fps_R1 = 0.0f;
-int		keys_R1 = 0;
-int		animationCount_R1 = 0;
-/*
-*/
 float elapsedTime2 = 0.0f;
 
 float proceduralTime = 0.0f;
@@ -247,17 +177,17 @@ float lightDirectionY;
 // Audio
 ISoundEngine* SoundEngine = createIrrKlangDevice();
 
-int minimalDistanceAudio = 3;
-int minimalDistanceTransforms = 8;
+int minimalDistanceAudio; // Se inicializa en Update
+int minimalDistanceTransforms;
 
 bool disableSounds = false;
 bool disableText = false;
 bool pressE = false;
 
 std::vector <glm::vec3> consoleFinalPositions; // Arreglo para la posición final de las consolas
-std::vector <bool> boolFinalPositions;
+std::vector <bool> boolFinalPositions; // Arreglo para saber si estan en su posición final
 
-int selectedConsole;
+int selectedConsole; // variable para saber que consola es la tomada
 
 // Entrada a función principal
 int main()
@@ -298,7 +228,6 @@ bool Start() {
 	std::vector <std::string > textPaths;
 	std::vector <glm::vec3> consolePositions; // Arreglo para guardar las posiciones de las consolas
 	
-
 	// Inicialización de GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -349,20 +278,12 @@ bool Start() {
 	castle = new Model("models/CastilloMaquetado2.fbx");
 	castleTransparent = new Model("models/CastleTransparentElements.fbx");
 	pillar = new Model("models/pilarGriego.fbx");
-	yoshi = new Model("models/Yoshi.fbx");
-	yoshiRojo = new Model("models/YoshiRojo.fbx");
-	toad = new Model("models/Toad.fbx");
-	bob = new Model("models/Bob-ombs.fbx");
-	player = new Model("models/Yoshi.fbx");
-	mario = new Model("models/Mario.fbx");
+	player = new Model("models/player.fbx");
 	cascada = new Model("models/cascada.fbx");
 	lago1 = new Model("models/AguaRefinado.fbx");
 	valla = new Model("models/CordonMuseo.fbx");
 	sign = new Model("models/flecha.fbx");
 
-	Cangre = new Model("models/Cangre.fbx");
-	LittleCessar = new Model("models/Little_Ceassar.fbx");
-	OXXO = new Model("models/OXXO.fbx");
 	mesa = new Model("models/mesa.fbx");
 	sensor = new Model("models/sensor.fbx");
 	sillon = new Model("models/sillon.fbx");
@@ -407,31 +328,7 @@ bool Start() {
 
 	fps = (float)player->getFramerate();
 	keys = (int)player->getNumFrames();
-	////Animacion 2
-	yoshi->SetPose(0.0f, gBones_a2);
 
-	fps_a2 = (float)yoshi->getFramerate();
-	keys_a2 = (int)yoshi->getNumFrames();
-	////Animacion 3
-	toad->SetPose(0.0f, gBones_a3);
-
-	fps_a3 = (float)toad->getFramerate();
-	keys_a3 = (int)toad->getNumFrames();
-	////Animacion 4
-	mario->SetPose(0.0f, gBones_a4);
-
-	fps_a4 = (float)mario->getFramerate();
-	keys_a4 = (int)mario->getNumFrames();
-
-	////Animacion bob
-	
-
-	bob->SetPose(0.0f, gBones_a4);
-
-	fps_R1 = (float)bob->getFramerate();
-	keys_R1 = (int)bob->getNumFrames();
-	/*
-	*/
 	camera1st.Position = playerPosition; // Posicion de la camara en 1ra persona
 	camera1st.Position += camera1stPersonOffset; // Alto respecto al personaje
 	camera1st.Front = forwardView;
@@ -483,7 +380,6 @@ bool Start() {
 	soundEffectsPaths.push_back("audio/gb.mp3");
 	soundEffectsPaths.push_back("audio/orb.mp3");
 
-
 	textPaths.push_back("models/textatari.fbx");
 	textPaths.push_back("models/textnes.fbx");
 	textPaths.push_back("models/textsnes.fbx");
@@ -521,11 +417,6 @@ bool Start() {
 	consoleFinalPositions.push_back(glm::vec3(13.8f, 4.9f, 56.0f));  // Posicion final de XBOXSX
 	//consoleFinalPositions.push_back();
 
-	for (size_t i = 0; i < MAX_CONSOLES; i++)
-	{
-		boolFinalPositions.push_back(false);
-	}
-	
 	glm::vec3 position;
 	glm::vec3 consolePosition;
 	std::string soundEffectPath;
@@ -534,7 +425,6 @@ bool Start() {
 	{
 		position = pillarsPositions.at(i);
 		soundEffectPath = soundEffectsPaths.at(i);
-		
 		gameObjectsPillars[i] = new GameObject(position, soundEffectPath); // Iniciamos los game objects
 	}
 
@@ -543,19 +433,18 @@ bool Start() {
 		consolePosition = consolePositions.at(i);
 		consoles[i] = new GameObject(consolePosition);
 		textInfo[i] = new Model(textPaths.at(i));
+		boolFinalPositions.push_back(false);
 	}
+
 	// RGBa (Red, Green, Blue and Alpha)
 	SoundEngine->play2D("audio/gta.mp3");
 	// SoundEngine->play2D("audio/KonosubaAudio.mp3");
 
-	minimalDistanceAudio = 5;
-
-	// atariGameObject = new GameObject(position);
+	minimalDistanceAudio = 3;
+	minimalDistanceTransforms = 8;
 	
 	return true;
 }
-
-
 
 void SetLightUniformInt(Shader* shader, const char* propertyName, size_t lightIndex, int value) {
 	std::ostringstream ss;
@@ -606,79 +495,7 @@ bool Update() {
 		elapsedTime = 0.0f;
 
 	}
-///// Animacion 2
-	float currentFrame_a2 = (float)glfwGetTime();
-	deltaTime_a2 = currentFrame_a2 - lastFrame_a2;
-	lastFrame_a2 = currentFrame_a2;
-
-	elapsedTime_a2 += deltaTime_a2;
-	if (elapsedTime_a2 > 1.0f / fps_a2) {
-		animationCount_a2++;
-		if (animationCount_a2 > keys_a2 - 1) {
-			animationCount_a2 = 0;
-		}
-		// Configuración de la pose en el instante t
-		yoshi->SetPose((float)animationCount_a2, gBones_a2);
-		elapsedTime_a2 = 0.0f;
-
-	}
-///// Animacion 3
-	float currentFrame_a3 = (float)glfwGetTime();
-	deltaTime_a3 = currentFrame_a3 - lastFrame_a3;
-	lastFrame_a3 = currentFrame_a3;
-
-	elapsedTime_a3 += deltaTime_a3;
-	if (elapsedTime_a3 > 1.0f / fps_a3) {
-		animationCount_a3++;
-		if (animationCount_a3 > keys_a3 - 1) {
-			animationCount_a3 = 0;
-		}
-		// Configuración de la pose en el instante t
-		toad->SetPose((float)animationCount_a3, gBones_a3);
-		elapsedTime_a3 = 0.0f;
-
-	}
-/*
-	*/
-///// Animacion 4
-	float currentFrame_a4 = (float)glfwGetTime();
-	deltaTime_a4 = currentFrame_a4 - lastFrame_a4;
-	lastFrame_a4 = currentFrame_a4;
-
-	elapsedTime2 += deltaTime; // Tiempo para la tecla de consolas
-
-	elapsedTime_a4 += deltaTime_a4;
-	if (elapsedTime_a4 > 1.0f / fps_a4) {
-		animationCount_a4++;
-		if (animationCount_a4 > keys_a4 - 1) {
-			animationCount_a4 = 0;
-		}
-		// Configuración de la pose en el instante t
-		mario->SetPose((float)animationCount_a4, gBones_a4);
-		elapsedTime_a4 = 0.0f;
-
-	}
-///// Animacion bob
-	float currentFrame_R1 = (float)glfwGetTime();
-	deltaTime_R1 = currentFrame_R1 - lastFrame_R1;
-	lastFrame_R1 = currentFrame_R1;
-
-
-	elapsedTime_R1 += deltaTime_R1;
-	if (elapsedTime_R1 > 1.0f / fps_R1) {
-		animationCount_R1++;
-		if (animationCount_R1 > keys_R1 - 1) {
-			animationCount_R1 = 0;
-		}
-		// Configuración de la pose en el instante t
-		bob->SetPose((float)animationCount_R1, gBones_R1);
-		elapsedTime_R1 = 0.0f;
-
-	}
-	/*
-*/
 	
-
 	// Procesa la entrada del teclado o mouse
 	processInput(window);
 
@@ -697,9 +514,6 @@ bool Update() {
 
 	{
 		staticShader->use();
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Activamos el shader del plano
 		staticShader->setMat4("view", view);
@@ -707,375 +521,18 @@ bool Update() {
 
 		// Aplicamos transformaciones del modelo
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
-
 		castle->Draw(*staticShader);
-	}
 
-	{
-		// Activamos el shader de Phong
-		waterfallShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		waterfallShader->setMat4("projection", projection);
-		waterfallShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		waterfallShader->setMat4("model", model);
-
-		waterfallShader->setFloat("time", waterfallTime);
-
-		cascada->Draw(*waterfallShader);
-		waterfallTime += 0.001;
-	}
-
-	{
-		// Activamos el shader de Phong
-		wavesShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		wavesShader->setMat4("projection", projection);
-		wavesShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		wavesShader->setMat4("model", model);
-
-		wavesShader->setFloat("time", wavesTime);
-
-		lago1->Draw(*wavesShader);
-		
-		wavesTime += 0.001;
-	}
-
-	{
-		// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.0035f, 0.0035f, 0.0035f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
-
-		// Dibujamos el modelo
-		player->Draw(*ourShader);
-	}
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	{
-			// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(59.0f, -1.0f, -9.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a2);
-
-		// Dibujamos el modelo
-		yoshi->Draw(*ourShader);
-	}
-
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	{
-			// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2.0f, 3.7f, 29.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a3);
-
-		// Dibujamos el modelo
-		toad->Draw(*ourShader);
-	}
-	
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	
-	{
-			// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-9.0f, 3.7f, 45.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a3);
-
-		// Dibujamos el modelo
-		toad->Draw(*ourShader);
-	}
-	
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	
-	{
-			// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(13.0f, 3.7f, 47.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00005f, 0.00005f, 0.00005f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a3);
-
-		// Dibujamos el modelo
-		toad->Draw(*ourShader);
-	}
-	
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	
-	
-
-	
-	{
-			// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-6.5f, 3.5f, 56.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(220.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00012f, 0.00012f, 0.00012f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_a4);
-
-		// Dibujamos el modelo
-		mario->Draw(*ourShader);
-	}
-	
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	
-	{
-			// Activación del shader del personaje
-		ourShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		ourShader->setMat4("view", view);
-		ourShader->setMat4("projection", projection);
-
-		// Aplicamos transformaciones del modelo
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.0f, 4.0f, 56.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.0005f, 0.0005f, 0.0005f));	// it's a bit too big for our scene, so scale it down
-
-		ourShader->setMat4("model", model);
-
-		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones_R1);
-
-		// Dibujamos el modelo
-		bob->Draw(*ourShader);
-	}
-	
-		glUseProgram(0); /// Instruccion para detener el ciclo de renderizado 
-	
-
-	mLightsShader->use();
-
-	{
-		// Activamos el shader del plano
-		mLightsShader->use();
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		for (size_t i = 0; i < MAX_PILLARS; i++)
-		{
-			// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-			mLightsShader->setMat4("projection", projection);
-			mLightsShader->setMat4("view", view);
-
-			glm::vec3 objectPosition = gameObjectsPillars[i]->getObjectPosition();
-			float objectRotationY = gameObjectsPillars[i]->getAngleZ();
-			auto distance = glm::length(playerPosition - objectPosition);
-
-
-
-			soundPath = gameObjectsPillars[i]->getSoundPathC();
-			if (distance < minimalDistanceAudio && !SoundEngine->isCurrentlyPlaying(soundPath) && !disableSounds) {
-				SoundEngine->stopAllSounds();
-				SoundEngine->play2D(soundPath);
-
-			}
-			if (distance < minimalDistanceTransforms) {
-				moveObject = gameObjectsPillars[i];
-				objectPosition = gameObjectsPillars[i]->getObjectPosition();
-			}
-			/*
-			if (distance < minimalDistanceAudio && !disableText) {
-				model = glm::mat4(1.0f);
-				
-
-
-				//model = glm::translate(model, camera1st.Position); // translate it down so it's at the center of the scene
-				//model = glm::rotate(model, glm::radians(rotateCharacter), camera1st.Front);
-				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.81f)); // translate it down so it's at the center of the scene
-				//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
-				model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-				
-				model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
-				staticShader->setMat4("model", model);
-				textInfo[i]->Draw(*staticShader);
-			}
-
-			*/
-
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
-			model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::rotate(model, glm::radians(objectRotationY), glm::vec3(0.0, 0.0f, 1.0f));
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 0.4f));	// it's a bit too big for our scene, so scale it down
-			mLightsShader->setMat4("model", model);
-
-			mLightsShader->setInt("numLights", (int)gLights.size());
-			for (size_t i = 0; i < gLights.size(); ++i) {
-				SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-				SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-				SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-				SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-				SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-				SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-			}
-
-			mLightsShader->setVec3("eye", activeCamera->Position);
-
-			mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-			mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-			mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-			mLightsShader->setFloat("transparency", material.transparency);
-
-			pillar->Draw(*mLightsShader);
-		}
-	}
-
-	staticShader->use();
-
-	{
-
-		// Activamos para objetos transparentes
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (size_t i = 0; i < MAX_CONSOLES; i++)
 		{
-			ourShader->setMat4("view", view);
-			ourShader->setMat4("projection", projection);
-
 			glm::vec3 objectPosition = consoleFinalPositions[i];
-			
+
 			auto distance = glm::length(playerPosition - objectPosition);
 
 			if (distance < minimalDistanceAudio && !disableText) {
 				model = glm::mat4(1.0f);
-
-
-
 				//model = glm::translate(model, camera1st.Position); // translate it down so it's at the center of the scene
 				//model = glm::rotate(model, glm::radians(rotateCharacter), camera1st.Front);
 				model = glm::translate(model, camera1st.Position + glm::vec3(0.0f, 0.0f, 0.81f)); // translate it down so it's at the center of the scene
@@ -1088,28 +545,12 @@ bool Update() {
 				textInfo[i]->Draw(*staticShader);
 			}
 		}
-		// Activación del shader del personaje
-		
-
-		
-
-	}
-
-	
-
-	staticShader->use();
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
 
 		// Aplicamos transformaciones del modelo
 		//mesa2
-		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(14.0f, 4.1f, 56.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		mesa->Draw(*staticShader);
@@ -1138,44 +579,464 @@ bool Update() {
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		mesa->Draw(*staticShader);
-		// OXXO
+
 		model = glm::mat4(1.0f);
-		//										  X  	Z	 Y
-		model = glm::translate(model, glm::vec3(70.0f, 6.5f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 6.5f, 0.0f)); // translate it down so it's at the center of the scene
+		//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(20.35f, 20.35f, 20.35f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		OXXO->Draw(*staticShader);
-
-		// LittleCessar
-		model = glm::mat4(1.0f);
-		//										  X  	Z	 Y
-		model = glm::translate(model, glm::vec3(-70.0f, 10.3f, 41.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
-		LittleCessar->Draw(*staticShader);
-		
-		// Krustaseo Kascarudo
-		model = glm::mat4(1.0f);
-		//										  X  	Z	 Y
-		model = glm::translate(model, glm::vec3(-70.0f, 5.0f, 20.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		Cangre->Draw(*staticShader);
+		bienvenida->Draw(*staticShader);
 
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(3.2f, 3.5f, -15.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.3f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-10.0f, 6.3f, 43.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00045f, 0.00047f, 0.00047f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		librero->Draw(*staticShader);
 	}
-	glUseProgram(0);
-
-	// Actividad 5.2
 
 	{
 		// Activamos el shader de Phong
-		proceduralShader->use();
+		waterfallShader->use();
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		waterfallShader->setMat4("projection", projection);
+		waterfallShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		waterfallShader->setMat4("model", model);
+
+		waterfallShader->setFloat("time", waterfallTime);
+
+		cascada->Draw(*waterfallShader);
+		waterfallTime += 0.001;
+	}
+
+	{
+		// Activamos el shader de Phong
+		wavesShader->use();
+
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+		wavesShader->setMat4("projection", projection);
+		wavesShader->setMat4("view", view);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		wavesShader->setMat4("model", model);
+
+		wavesShader->setFloat("time", wavesTime);
+
+		lago1->Draw(*wavesShader);
+		
+		wavesTime += 0.001;
+	}
+
+	ourShader->use();
+
+	{
+		// Activación del shader del personaje
+		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+
+		ourShader->setMat4("view", view);
+		ourShader->setMat4("projection", projection);
+
+		// Aplicamos transformaciones del modelo
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, playerPosition); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(rotateCharacter), glm::vec3(0.0, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0035f, 0.0035f, 0.0035f));	// it's a bit too big for our scene, so scale it down
+
+		ourShader->setMat4("model", model);
+
+		ourShader->setMat4("gBones", MAX_RIGGING_BONES, gBones);
+
+		// Dibujamos el modelo
+		player->Draw(*ourShader);
+	}
+
+	mLightsShader->use();
+
+	{
+		mLightsShader->setMat4("projection", projection);
+		mLightsShader->setMat4("view", view);
+
+		mLightsShader->setInt("numLights", (int)gLights.size());
+		for (size_t i = 0; i < gLights.size(); ++i) {
+			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
+			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
+			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
+			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
+			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
+			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
+		}
+
+		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
+		mLightsShader->setFloat("transparency", material.transparency);
+
+		for (size_t i = 0; i < MAX_PILLARS; i++)
+		{
+			// Aplicamos transformaciones de proyección y cámara (si las hubiera)
+			glm::vec3 objectPosition = gameObjectsPillars[i]->getObjectPosition();
+			float objectRotationY = gameObjectsPillars[i]->getAngleZ();
+			auto distance = glm::length(playerPosition - objectPosition);
+
+			soundPath = gameObjectsPillars[i]->getSoundPathC();
+			if (distance < minimalDistanceAudio && !SoundEngine->isCurrentlyPlaying(soundPath) && !disableSounds) {
+				SoundEngine->stopAllSounds();
+				SoundEngine->play2D(soundPath);
+
+			}
+			if (distance < minimalDistanceTransforms) {
+				moveObject = gameObjectsPillars[i];
+				objectPosition = gameObjectsPillars[i]->getObjectPosition();
+			}
+
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, objectPosition); // translate it down so it's at the center of the scene
+			model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			model = glm::rotate(model, glm::radians(objectRotationY), glm::vec3(0.0, 0.0f, 1.0f));
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 0.4f));	// it's a bit too big for our scene, so scale it down
+			mLightsShader->setMat4("model", model);
+
+			mLightsShader->setVec3("eye", activeCamera->Position);
+			pillar->Draw(*mLightsShader);
+		}
+
+		if (pressE && !boolFinalPositions.at(PS1) && selectedConsole == PS1) {
+			consoles[PS1]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+
+
+		// Aplicamos transformaciones del modelo
+
+		model = glm::mat4(1.0f);
+		glm::vec3 objectPosition = consoles[PS1]->getObjectPosition();
+		auto distance = glm::length(consoleFinalPositions.at(PS1) - objectPosition);
+		if (distance <= 5.0f) {
+			model = glm::translate(model, consoleFinalPositions.at(PS1)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(PS1) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.015f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down //y x z
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		ps1->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-0.4f, 5.5f, 34.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(2.0f, 3.0f, 2.0f));	// it's a bit too big for our scene, so scale it down	//y 
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		sensor->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(8.0f, 4.0f, 42.5f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(135.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		sillon->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(XBOXSX) && selectedConsole == XBOXSX) {
+			consoles[XBOXSX]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[XBOXSX]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(XBOXSX) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(XBOXSX)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(XBOXSX) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		xbox->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(N64) && selectedConsole == N64) {
+			consoles[N64]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[N64]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(N64) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(N64)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(N64) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		n64->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(XBOX360) && selectedConsole == XBOX360) {
+			consoles[XBOX360]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[XBOX360]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(XBOX360) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(XBOX360)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(XBOX360) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 0.2f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		xbox360->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(SNES) && selectedConsole == SNES) {
+			consoles[SNES]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[SNES]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(SNES) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(SNES)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(SNES) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		snes->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(GAMECUBE) && selectedConsole == GAMECUBE) {
+			consoles[GAMECUBE]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[GAMECUBE]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(GAMECUBE) - objectPosition);
+		if (distance <= 2.0f) {
+			model = glm::translate(model, consoleFinalPositions.at(GAMECUBE)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(GAMECUBE) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		gameCube->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(ATARI) && selectedConsole == ATARI) {
+			consoles[ATARI]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[ATARI]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(ATARI) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(ATARI)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(ATARI) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.04f, 0.04f));	// it's a bit too big for our scene, so scale it down//x y z
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		atari->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(NES) && selectedConsole == NES) {
+			consoles[NES]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[NES]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(NES) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(NES)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(NES) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		nes->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(WII) && selectedConsole == WII) {
+			consoles[WII]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[WII]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(WII) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(WII)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(WII) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.18f, 0.18f, 0.18f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		wii->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(PSP) && selectedConsole == PSP) {
+			consoles[PSP]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[PSP]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(PSP) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(PSP)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(PSP) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		psp->Draw(*mLightsShader);
+
+		if (pressE && !boolFinalPositions.at(PS2) && selectedConsole == PS2) {
+			consoles[PS2]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
+		}
+		model = glm::mat4(1.0f);
+		objectPosition = consoles[PS2]->getObjectPosition();
+		distance = glm::length(consoleFinalPositions.at(PS2) - objectPosition);
+		if (distance <= 1.5f) {
+			model = glm::translate(model, consoleFinalPositions.at(PS2)); // translate it down so it's at the center of the scene
+			boolFinalPositions.at(PS2) = true;
+		}
+		else {
+			model = glm::translate(model, objectPosition);
+		}
+		model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.15f, 0.15f, 0.15f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		ps2->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-0.4f, 3.6f, 50.7f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec4("MaterialAmbientColor", oro.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", oro.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", oro.specular);
+		mLightsShader->setFloat("transparency", oro.transparency);
+		valla->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-0.4f, 20.1, 50.7f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
+		mLightsShader->setFloat("transparency", silver.transparency);
+		root->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
+		model = glm::translate(model, glm::vec3(-0.4f, 20.1, 60.7f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		mLightsShader->setMat4("model", model);
+		root->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(6.6f, 5.0f, 58.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.0002f, 0.0002f, 0.0002f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		computadora->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(8.0f, 4.5f, 58.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.09f, 0.09f, 0.09f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		mLightsShader->setVec4("MaterialAmbientColor", plastic.ambient);
+		mLightsShader->setVec4("MaterialDiffuseColor", plastic.diffuse);
+		mLightsShader->setVec4("MaterialSpecularColor", plastic.specular);
+		mLightsShader->setFloat("transparency", plastic.transparency);
+		silla->Draw(*mLightsShader);
+	}
+
+	proceduralShader->use();
+
+	{
+		// Activamos el shader de Phong
 
 		// Activamos para objetos transparentes
 		glEnable(GL_BLEND);
@@ -1221,929 +1082,10 @@ bool Update() {
 
 	}
 
-	glUseProgram(0);
-
-
 	staticShader->use();
+
 	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa2
-
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 6.5f, 0.0f)); // translate it down so it's at the center of the scene
-		//model = glm::translate(model, camera1st.Position + camera1stPersonOffset+ glm::vec3(0.0f, 0.0f, 1.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-		model = glm::scale(model, glm::vec3(0.35f, 0.35f, 0.35f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		bienvenida->Draw(*staticShader);
-	}
-
-
-	staticShader->use();
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa2
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.2f, 3.5f, -15.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		sign->Draw(*staticShader);
-	}
-
-	glUseProgram(0);
-
-	staticShader->use();
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa2
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		sign->Draw(*staticShader);
-	}
-
-	glUseProgram(0);
-
-
-	staticShader->use();
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa2
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		sign->Draw(*staticShader);
-	}
-
-	glUseProgram(0);
-
-
-
-
-	staticShader->use();
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa2
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2.3f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		sign->Draw(*staticShader);
-	}
-
-	glUseProgram(0);
-
-
-	staticShader->use();
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		staticShader->setMat4("projection", projection);
-		staticShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa2
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-10.0f, 6.3f, 43.0f)); // translate it down so it's at the center of the scene
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00045f, 0.00047f, 0.00047f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		librero->Draw(*staticShader);
-	}
-
-
-	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
-	{
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		if (pressE && !boolFinalPositions.at(PS1) && selectedConsole == PS1) {
-			consoles[PS1]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[PS1]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(PS1) - objectPosition);
-		if (distance <= 5.0f) {
-			model = glm::translate(model, consoleFinalPositions.at(PS1)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(PS1) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-
 		
-		
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.015f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down //y x z
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i){
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-		ps1->Draw(*mLightsShader);
-	}
-
-
-
-	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
-	{
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-0.4f, 5.5f, 34.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 3.0f, 2.0f));	// it's a bit too big for our scene, so scale it down	//y 
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-		sensor->Draw(*mLightsShader);
-	}
-
-
-
-	mLightsShader->use(); // Cambiamos a que OpenGL use el shader de multiples iluminaciones
-	{
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(8.0f, 4.0f, 42.5f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(135.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-		sillon->Draw(*mLightsShader);
-	}
-
-	mLightsShader->use();
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		if (pressE && !boolFinalPositions.at(XBOXSX) && selectedConsole == XBOXSX) {
-			consoles[XBOXSX]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[XBOXSX]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(XBOXSX) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(XBOXSX)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(XBOXSX) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-		
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		xbox->Draw(*mLightsShader);
-	}
-
-	mLightsShader->use(); // Activamos el shader de iluminación
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(N64) && selectedConsole == N64) {
-			consoles[N64]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[N64]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(N64) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(N64)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(N64) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-		
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		n64->Draw(*mLightsShader);
-	}
-
-	mLightsShader->use(); // Activamos el shader de iluminación
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//Computadora
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(6.6f, 5.0f, 58.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.0002f, 0.0002f, 0.0002f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
-		mLightsShader->setFloat("transparency", silver.transparency);
-
-		computadora->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//Silla
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(8.0f, 4.5f, 58.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(40.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.09f, 0.09f, 0.09f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", plastic.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", plastic.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", plastic.specular);
-		mLightsShader->setFloat("transparency", plastic.transparency);
-
-		silla->Draw(*mLightsShader);
-	}
-
-	mLightsShader->use();
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(XBOX360) && selectedConsole == XBOX360) {
-			consoles[XBOX360]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[XBOX360]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(XBOX360) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(XBOX360)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(XBOX360) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-		
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		// model = glm::rotate(model, glm::radians(-190.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 0.2f, 0.1f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		xbox360->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(SNES) && selectedConsole == SNES) {
-			consoles[SNES]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[SNES]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(SNES) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(SNES)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(SNES) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		snes->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(GAMECUBE) && selectedConsole == GAMECUBE) {
-			consoles[GAMECUBE]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[GAMECUBE]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(GAMECUBE) - objectPosition);
-		if (distance <= 2.0f) {
-			model = glm::translate(model, consoleFinalPositions.at(GAMECUBE)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(GAMECUBE) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		gameCube->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		if (pressE && !boolFinalPositions.at(ATARI) && selectedConsole == ATARI) {
-			consoles[ATARI]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[ATARI]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(ATARI) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(ATARI)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(ATARI) = true;
-		}	
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-			
-		
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.03f, 0.04f, 0.04f));	// it's a bit too big for our scene, so scale it down//x y z
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		atari->Draw(*mLightsShader);
-	}
-
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(NES) && selectedConsole == NES) {
-			consoles[NES]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[NES]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(NES) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(NES)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(NES) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		nes->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(WII) && selectedConsole == WII) {
-			consoles[WII]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[WII]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(WII) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(WII)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(WII) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.18f, 0.18f, 0.18f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		wii->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(PSP) && selectedConsole == PSP) {
-			consoles[PSP]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[PSP]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(PSP) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(PSP)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(PSP) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		psp->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		if (pressE && !boolFinalPositions.at(PS2) && selectedConsole == PS2) {
-			consoles[PS2]->setObjectPosition(playerPosition + textInfoOffset); // añadir offset
-		}
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f);
-		glm::vec3 objectPosition = consoles[PS2]->getObjectPosition();
-		auto distance = glm::length(consoleFinalPositions.at(PS2) - objectPosition);
-		if (distance <= 1.5f) {
-			model = glm::translate(model, consoleFinalPositions.at(PS2)); // translate it down so it's at the center of the scene
-			boolFinalPositions.at(PS2) = true;
-		}
-		else {
-			model = glm::translate(model, objectPosition);
-		}
-
-
-		model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.15f, 0.15f, 0.15f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", material.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", material.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", material.specular);
-		mLightsShader->setFloat("transparency", material.transparency);
-
-		ps2->Draw(*mLightsShader);
-	}
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-		model = glm::translate(model, glm::vec3(-0.4f, 3.6f, 50.7f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", oro.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", oro.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", oro.specular);
-		mLightsShader->setFloat("transparency", oro.transparency);
-
-		valla->Draw(*mLightsShader);
-	}
-
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-		model = glm::translate(model, glm::vec3(-0.4f, 20.1, 50.7f)); // translate it down so it's at the center of the scene
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
-		mLightsShader->setFloat("transparency", silver.transparency);
-
-		root->Draw(*mLightsShader);
-	}
-
-
-	{
-		// Aplicamos transformaciones de proyección y cámara (si las hubiera)
-
-		mLightsShader->setMat4("projection", projection);
-		mLightsShader->setMat4("view", view);
-
-		// Aplicamos transformaciones del modelo
-		//mesa1
-		model = glm::mat4(1.0f); //-3.5f, 4.25f, 53.8f));//centro-frente, derecha
-		model = glm::translate(model, glm::vec3(-0.4f, 20.1, 60.7f)); // translate it down so it's at the center of the scene
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-
-		mLightsShader->setInt("numLights", (int)gLights.size());
-		for (size_t i = 0; i < gLights.size(); ++i) {
-			SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
-			SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
-			SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
-			SetLightUniformVec4(mLightsShader, "Power", i, gLights[i].Power);
-			SetLightUniformInt(mLightsShader, "alphaIndex", i, gLights[i].alphaIndex);
-			SetLightUniformFloat(mLightsShader, "distance", i, gLights[i].distance);
-		}
-
-		mLightsShader->setVec3("eye", activeCamera->Position);
-
-		mLightsShader->setVec4("MaterialAmbientColor", silver.ambient);
-		mLightsShader->setVec4("MaterialDiffuseColor", silver.diffuse);
-		mLightsShader->setVec4("MaterialSpecularColor", silver.specular);
-		mLightsShader->setFloat("transparency", silver.transparency);
-
-		root->Draw(*mLightsShader);
-	}
-
-
-	{
-		staticShader->use();
 		// Activamos para objetos transparentes
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2155,10 +1097,8 @@ bool Update() {
 		// Aplicamos transformaciones del modelo
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-		// model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
-
 		
 		castleTransparent->Draw(*staticShader);
 	}
