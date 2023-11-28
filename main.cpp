@@ -72,7 +72,7 @@ float elapsedTime = 0.0f;
 
 glm::vec3 playerPosition(0.0f, 4.5f, 0.0f); // Posicion del personaje
 glm::vec3 forwardView(0.0f, 0.0f, 1.0f); // Movimiento hacia adelante
-glm::vec3 camera1stPersonOffset(0.0f, 2.0f, -1.0f); // Cambiar posision en Y
+glm::vec3 camera1stPersonOffset(0.0f, 1.0f, -1.0f); // Cambiar posision en Y
 glm::vec3 camera3rdPersonOffset(0.0f, 4.0f, -5.0f);
 glm::vec3 textInfoOffset(0.0f, 0.0f, 0.81f);
 
