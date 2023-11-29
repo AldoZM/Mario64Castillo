@@ -589,16 +589,9 @@ bool Update() {
 		staticShader->setMat4("model", model);
 		bienvenida->Draw(*staticShader);
 
+		//Flechas lado izquierdo
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.2f, 3.5f, -15.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		sign->Draw(*staticShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(3.5f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
@@ -606,9 +599,9 @@ bool Update() {
 		sign->Draw(*staticShader);
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(3.5f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-120.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
@@ -621,17 +614,9 @@ bool Update() {
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
 
-
+		//Flechas lado derecho
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.2f, 3.5f, -15.6f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		sign->Draw(*staticShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-4.5f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
@@ -639,15 +624,15 @@ bool Update() {
 		sign->Draw(*staticShader);
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-4.5f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-60.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.3f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(-3.35f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		//model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
