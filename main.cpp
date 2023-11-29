@@ -87,6 +87,7 @@ Shader* staticShader;
 Shader* wavesShader;
 Shader* waterfallShader;
 Shader* proceduralShader;
+Shader* phongShader;
 
 // Carga la información del modelo
 Model* castle;
@@ -184,6 +185,8 @@ bool disableSounds = false;
 bool disableText = false;
 bool pressE = false;
 
+Light lightCastle;
+
 std::vector <glm::vec3> consoleFinalPositions; // Arreglo para la posición final de las consolas
 std::vector <bool> boolFinalPositions; // Arreglo para saber si estan en su posición final
 
@@ -268,6 +271,7 @@ bool Start() {
 	wavesShader = new Shader("shaders/wavesAnimation.vs", "shaders/wavesAnimation.fs"); // Shader para la el agua
 	waterfallShader = new Shader("shaders/waterfallAnimation.vs", "shaders/waterfallAnimation.fs"); // Shader para la cascada
 	proceduralShader = new Shader("shaders/12_ProceduralAnimation.vs", "shaders/12_ProceduralAnimation.fs");//Shader de la luna
+	phongShader = new Shader("shaders/11_BasicPhongShader.vs", "shaders/11_BasicPhongShader.fs");
 
 	// Máximo número de huesos: 100
 	ourShader->setBonesIDs(MAX_RIGGING_BONES);
@@ -342,7 +346,7 @@ bool Start() {
 	Light light;
 	light.Position = glm::vec3(4.0f, 20.0f, 45.0f);
 	light.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	light.Color = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	light.Color = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
 
 	gLights.push_back(light);
 
@@ -352,6 +356,11 @@ bool Start() {
 	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 1.0f);
 
 	gLights.push_back(light02);
+
+	
+	lightCastle.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
+	lightCastle.Direction = glm::vec3(1.0f, 0.0f, 0.0f);
+	lightCastle.Color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	
 
 	// Configuración de la camara
@@ -781,12 +790,6 @@ bool Update() {
 
 		
 
-		model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
-		mLightsShader->setMat4("model", model);
-		mLightsShader->setVec3("eye", activeCamera->Position);
-		castle->Draw(*mLightsShader);
-
 
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -1060,6 +1063,31 @@ bool Update() {
 		mLightsShader->setVec4("MaterialSpecularColor", plastic.specular);
 		mLightsShader->setFloat("transparency", plastic.transparency);
 		silla->Draw(*mLightsShader);
+	}
+
+	phongShader->use();
+
+	{
+		phongShader->setMat4("projection", projection);
+		phongShader->setMat4("view", view);
+
+		model = glm::mat4(1.0f);
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
+		phongShader->setMat4("model", model);
+		
+		phongShader->setVec4("LightColor", lightCastle.Color);
+		phongShader->setVec4("LightPower", lightCastle.Power);
+		phongShader->setInt("alphaIndex", lightCastle.alphaIndex);
+		phongShader->setFloat("distance", lightCastle.distance);
+		phongShader->setVec3("lightPosition", lightCastle.Position);
+		phongShader->setVec3("lightDirection", lightCastle.Direction);
+		phongShader->setVec3("eye", activeCamera->Position);
+
+		phongShader->setVec4("MaterialAmbientColor", material.ambient);
+		phongShader->setVec4("MaterialDiffuseColor", material.diffuse);
+		phongShader->setVec4("MaterialSpecularColor", material.specular);
+		phongShader->setFloat("transparency", material.transparency);
+		castle->Draw(*phongShader);
 	}
 
 	proceduralShader->use();
