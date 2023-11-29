@@ -342,14 +342,14 @@ bool Start() {
 	Light light;
 	light.Position = glm::vec3(4.0f, 20.0f, 45.0f);
 	light.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	light.Color = glm::vec4(0.5f, 0.0f, 0.0f, 0.5f);
+	light.Color = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	gLights.push_back(light);
 
 	Light light02;
 	light02.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
 	light02.Direction = glm::vec3(1.0f, 0.0f, 0.0f);
-	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 0.5f);
+	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 1.0f);
 
 	gLights.push_back(light02);
 	
@@ -520,11 +520,12 @@ bool Update() {
 		staticShader->setMat4("projection", projection);
 
 		// Aplicamos transformaciones del modelo
+		/*
 		model = glm::mat4(1.0f);
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		castle->Draw(*staticShader);
-
+		*/
 		for (size_t i = 0; i < MAX_CONSOLES; i++)
 		{
 			glm::vec3 objectPosition = consoleFinalPositions[i];
@@ -792,6 +793,16 @@ bool Update() {
 		else {
 			model = glm::translate(model, objectPosition);
 		}
+
+		
+
+		model = glm::mat4(1.0f);
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		castle->Draw(*mLightsShader);
+
+
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.015f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down //y x z
