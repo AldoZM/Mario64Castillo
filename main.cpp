@@ -342,14 +342,14 @@ bool Start() {
 	Light light;
 	light.Position = glm::vec3(4.0f, 20.0f, 45.0f);
 	light.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	light.Color = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
+	light.Color = glm::vec4(0.5f, 0.0f, 0.0f, 0.5f);
 
 	gLights.push_back(light);
 
 	Light light02;
 	light02.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
 	light02.Direction = glm::vec3(1.0f, 0.0f, 0.0f);
-	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 1.0f);
+	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 0.5f);
 
 	gLights.push_back(light02);
 	
@@ -600,7 +600,7 @@ bool Update() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
@@ -608,7 +608,7 @@ bool Update() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
@@ -617,6 +617,39 @@ bool Update() {
 		model = glm::translate(model, glm::vec3(2.3f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.2f, 3.5f, -15.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.2f, 4.1f, 2.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.2f, 4.1f, 15.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
+		staticShader->setMat4("model", model);
+		sign->Draw(*staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.3f, 3.5f, 28.6f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));	// it's a bit too big for our scene, so scale it down
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
