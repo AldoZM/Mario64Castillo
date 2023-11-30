@@ -346,21 +346,22 @@ bool Start() {
 	Light light;
 	light.Position = glm::vec3(4.0f, 20.0f, 45.0f);
 	light.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	light.Color = glm::vec4(0.5f, 0.0f, 0.0f, 1.0f);
-
+	light.Color = glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	light.Power = glm::vec4(200.0f, 200.0f, 200.0f, 1.0f);
 	gLights.push_back(light);
 
 	Light light02;
 	light02.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
 	light02.Direction = glm::vec3(1.0f, 0.0f, 0.0f);
-	light02.Color = glm::vec4(0.0f, 0.0f, 0.5f, 1.0f);
-
+	light02.Color = glm::vec4(0.0f, 0.0f, 0.6f, 1.0f);
+	light02.Power = glm::vec4(200.0f, 200.0f, 200.0f, 1.0f);
 	gLights.push_back(light02);
 
 	
-	lightCastle.Position = glm::vec3(-5.0f, 20.0f, 53.0f);
+	lightCastle.Position = glm::vec3(-5.0f, 55.0f, 53.0f);
 	lightCastle.Direction = glm::vec3(1.0f, 0.0f, 0.0f);
-	lightCastle.Color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	lightCastle.Color = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	lightCastle.Power = glm::vec4(500.0f, 500.0f, 500.0f, 1.0f);
 	
 
 	// Configuración de la camara
@@ -649,12 +650,7 @@ bool Update() {
 		staticShader->setMat4("model", model);
 		sign->Draw(*staticShader);
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-10.0f, 6.3f, 43.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.00045f, 0.00047f, 0.00047f));	// it's a bit too big for our scene, so scale it down
-		staticShader->setMat4("model", model);
-		librero->Draw(*staticShader);
+		
 	}
 
 	{
@@ -798,6 +794,8 @@ bool Update() {
 		mLightsShader->setVec3("eye", activeCamera->Position);
 		ps1->Draw(*mLightsShader);
 
+
+
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(-0.4f, 5.5f, 34.0f)); // translate it down so it's at the center of the scene
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -806,6 +804,14 @@ bool Update() {
 		mLightsShader->setMat4("model", model);
 		mLightsShader->setVec3("eye", activeCamera->Position);
 		sensor->Draw(*mLightsShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-10.0f, 6.3f, 43.0f)); // translate it down so it's at the center of the scene
+		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00045f, 0.00047f, 0.00047f));	// it's a bit too big for our scene, so scale it down
+		mLightsShader->setMat4("model", model);
+		mLightsShader->setVec3("eye", activeCamera->Position);
+		librero->Draw(*mLightsShader);
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(8.0f, 4.0f, 42.5f)); // translate it down so it's at the center of the scene
@@ -1129,12 +1135,15 @@ bool Update() {
 		model = glm::scale(model, glm::vec3(50.0f, 50.0f, 50.0f));
 		proceduralShader->setMat4("model", model);
 
-		proceduralShader->setFloat("time", proceduralTime-3.14159);
+		proceduralShader->setFloat("time", proceduralTime+3.14);
 		proceduralShader->setFloat("radius", 50.0f);
 		proceduralShader->setFloat("height", 40.0f);
 
 		sun->Draw(*proceduralShader);
 
+
+		//lightCastle.Color = glm::vec4(sin(proceduralTime)* 0.2 + 0.2, sin(proceduralTime)*0.2+0.2, sin(proceduralTime + 3.14)* 0.2 + 0.2, 1.0f);
+		
 		proceduralTime += 0.001;
 
 	}
